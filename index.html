@@ -3,304 +3,304 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>今日好运指数 · 娱乐测试</title>
+<title>每日运势 · 娱乐测试</title>
 <style>
-  :root {
-    --bg: #0f0d1a;
-    --card: #1c1930;
-    --gold: #f5c451;
-    --purple: #8b7cf6;
-    --text: #f0eee8;
-    --muted: #9a94b8;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
-    background: radial-gradient(ellipse at 50% 0%, #2a1f4d 0%, var(--bg) 60%);
-    color: var(--text);
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(160deg, #ffe3ee 0%, #ffd6e8 35%, #e8d5ff 100%);
     min-height: 100vh;
-    padding: 24px 16px 48px;
     max-width: 480px;
     margin: 0 auto;
+    padding: 28px 18px 60px;
+    color: #4a3b52;
+    position: relative;
+    overflow-x: hidden;
   }
-  .badge {
-    display: inline-block;
-    font-size: 11px;
-    color: var(--muted);
-    border: 1px solid #3a3358;
-    border-radius: 999px;
-    padding: 3px 10px;
-    margin-bottom: 20px;
+  /* 背景装饰 */
+  .deco {
+    position: fixed; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.75), rgba(255,255,255,0) 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .zodiac-badge {
+    position: fixed; width: 54px; height: 54px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; color: #fff; z-index: 1;
+    background: linear-gradient(135deg, #ffb6d9, #c9a7ff);
+    box-shadow: 0 6px 18px rgba(233,142,192,.45);
+  }
+  .zb-tl { top: 40px; right: 18px; transform: rotate(-12deg); }
+  .zb-bl { bottom: 60px; left: 14px; transform: rotate(10deg); opacity: .85; }
+
+  .wrap { position: relative; z-index: 2; }
+  .disclaimer-tag {
+    display: inline-block; font-size: 10px; color: #b58ab0;
+    background: rgba(255,255,255,.6); border-radius: 999px; padding: 3px 10px;
+    margin-bottom: 14px;
   }
   h1 {
-    font-size: 26px;
-    background: linear-gradient(120deg, var(--gold), #fff3d6, var(--gold));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    margin-bottom: 6px;
+    font-size: 34px; letter-spacing: 4px; text-align: center;
+    color: #3d2e46; font-weight: 800;
+    text-shadow: 0 2px 0 #fff, 0 4px 14px rgba(233,142,192,.35);
   }
-  .sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
-  .card {
-    background: var(--card);
-    border: 1px solid #2e2950;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
+  .subtitle { text-align: center; font-size: 12px; color: #9a7d96; margin: 8px 0 24px; }
+
+  .phone-card {
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(12px);
+    border-radius: 26px;
+    padding: 22px 18px;
+    box-shadow: 0 12px 40px rgba(220,120,180,.22);
+    margin-bottom: 18px;
   }
-  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
-  input, select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid #3a3358;
-    background: #141223;
-    color: var(--text);
-    font-size: 15px;
+
+  /* 输入区 */
+  .field label { display: block; font-size: 13px; color: #8a6b88; margin: 12px 0 6px; font-weight: 600; }
+  .field input, .field select {
+    width: 100%; padding: 12px 14px; border-radius: 14px; border: none;
+    background: #fff; color: #4a3b52; font-size: 15px;
+    box-shadow: inset 0 1px 4px rgba(220,120,180,.12);
+    appearance: none; outline: none;
   }
-  button {
-    width: 100%;
-    padding: 14px;
-    margin-top: 22px;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    background: linear-gradient(120deg, var(--gold), #e0a63c);
-    color: #1a130a;
-    cursor: pointer;
+  .go-btn {
+    width: 100%; padding: 15px; margin-top: 22px; border: none; border-radius: 999px;
+    font-size: 17px; font-weight: 700; letter-spacing: 2px; color: #fff; cursor: pointer;
+    background: linear-gradient(120deg, #ff9ec7, #c9a7ff);
+    box-shadow: 0 8px 22px rgba(233,142,192,.5);
   }
-  button:active { transform: scale(0.98); }
-  .hidden { display: none; }
-  .score-ring {
-    width: 160px; height: 160px;
-    margin: 10px auto 6px;
-    border-radius: 50%;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    background: conic-gradient(var(--gold) calc(var(--s) * 1%), #2e2950 0);
-    position: relative;
+  .go-btn:active { transform: scale(.97); }
+
+  /* 日期切换 */
+  .date-tabs { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab {
+    padding: 6px 13px; border-radius: 999px; font-size: 12px;
+    background: rgba(255,255,255,.8); color: #9a7d96; cursor: pointer; border: none;
   }
-  .score-ring::before {
-    content: "";
-    position: absolute;
-    width: 128px; height: 128px;
-    border-radius: 50%;
-    background: var(--card);
+  .tab.active { background: linear-gradient(120deg, #ff9ec7, #c9a7ff); color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(233,142,192,.4); }
+  .tab.disabled { opacity: .4; cursor: default; }
+
+  .profile-line { font-size: 11px; color: #a98ba6; text-align: center; margin-bottom: 10px; }
+  .day-title { font-size: 17px; font-weight: 700; color: #3d2e46; }
+  .day-stars { color: #ffb056; letter-spacing: 2px; font-size: 14px; margin-left: 8px; }
+
+  /* 六维进度条 */
+  .dims { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; margin-top: 14px; }
+  .dim .dim-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+  .dim .dim-pct { font-weight: 700; }
+  .bar { height: 7px; border-radius: 999px; background: rgba(255,255,255,.9); overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width 1s ease; }
+  .c-pink  { background: linear-gradient(90deg, #ffb3d1, #ff7eb3); }
+  .c-blue  { background: linear-gradient(90deg, #a8d8ff, #6cb6ff); }
+  .c-orange{ background: linear-gradient(90deg, #ffd591, #ffa940); }
+  .c-green { background: linear-gradient(90deg, #b7eb8f, #73d13d); }
+  .c-purple{ background: linear-gradient(90deg, #d3b5ff, #9254de); }
+  .c-teal  { background: linear-gradient(90deg, #87e8de, #13c2c2); }
+
+  /* 幸运物 2x2 */
+  .lucky-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .lucky-card {
+    border-radius: 16px; padding: 12px; position: relative; overflow: hidden;
   }
-  .score-num, .score-label { position: relative; z-index: 1; text-align: center; }
-  .score-num { font-size: 42px; font-weight: 700; color: var(--gold); }
-  .score-label { font-size: 12px; color: var(--muted); }
-  .verdict {
-    text-align: center;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--gold);
-    margin: 8px 0 16px;
+  .lc-pink  { background: #ffe0ec; } .lc-purple{ background: #ece0ff; }
+  .lc-orange{ background: #fff0db; } .lc-green { background: #e2f7d9; }
+  .lucky-card .lc-label { font-size: 12px; color: #7a6588; margin-bottom: 4px; }
+  .lucky-card .lc-value { font-size: 14px; font-weight: 700; color: #4a3b52; }
+  .lucky-card .lc-icon { position: absolute; right: 10px; bottom: 8px; font-size: 22px; opacity: .8; }
+
+  /* 文字区 */
+  .text-block {
+    background: rgba(255,255,255,.72); backdrop-filter: blur(12px);
+    border-radius: 22px; padding: 18px; box-shadow: 0 10px 30px rgba(220,120,180,.18);
   }
-  .item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #2e2950; font-size: 14px; }
-  .item:last-child { border-bottom: none; }
-  .stars { color: var(--gold); letter-spacing: 2px; }
-  .desc { font-size: 14px; line-height: 1.8; color: #d5d0e8; margin-top: 12px; }
-  .tip-title { font-size: 15px; font-weight: 600; color: var(--gold); margin: 14px 0 6px; }
+  .tb-title { font-size: 15px; font-weight: 700; color: #3d2e46; margin-bottom: 8px; }
+  .tb-body { font-size: 13px; line-height: 1.9; color: #6b5570; text-align: justify; }
   .rule-tag {
-    display: inline-block; font-size: 11px; color: var(--purple);
-    border: 1px solid var(--purple); border-radius: 999px; padding: 2px 8px; margin-top: 10px;
+    display: inline-block; margin-top: 10px; font-size: 10px; color: #8d6fd0;
+    background: rgba(146,84,222,.08); border: 1px solid rgba(146,84,222,.25);
+    border-radius: 999px; padding: 2px 9px;
+  }
+
+  /* 分享按钮 + 转化 */
+  .share-btn {
+    width: 100%; padding: 13px; margin-top: 14px; border: none; border-radius: 999px;
+    font-size: 15px; font-weight: 600; color: #6b5570; cursor: pointer;
+    background: rgba(255,255,255,.85); box-shadow: 0 6px 18px rgba(220,120,180,.2);
   }
   .upsell {
-    background: linear-gradient(120deg, #2a1f4d, #1c1930);
-    border: 1px solid var(--gold);
-    border-radius: 16px;
-    padding: 20px;
-    margin-top: 8px;
-    text-align: center;
+    background: linear-gradient(120deg, #ff9ec7, #c9a7ff);
+    border-radius: 22px; padding: 20px; margin-top: 18px; text-align: center;
+    box-shadow: 0 12px 34px rgba(233,142,192,.45);
   }
-  .upsell h3 { color: var(--gold); font-size: 17px; margin-bottom: 8px; }
-  .upsell p { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
-  .upsell button { margin-top: 0; }
-  .footer {
-    margin-top: 28px;
-    font-size: 11px;
-    color: #6b6590;
-    text-align: center;
-    line-height: 1.8;
+  .upsell h3 { color: #fff; font-size: 17px; margin-bottom: 6px; }
+  .upsell p { color: rgba(255,255,255,.92); font-size: 12px; line-height: 1.7; margin-bottom: 14px; }
+  .upsell button {
+    width: auto; padding: 11px 34px; border: none; border-radius: 999px;
+    background: #fff; color: #d4548f; font-size: 15px; font-weight: 800; cursor: pointer;
   }
-  .share-btn {
-    background: #2e2950;
-    color: var(--text);
-    margin-top: 10px;
-  }
+  .footer { text-align: center; font-size: 10px; color: #b195ad; line-height: 1.8; margin-top: 26px; }
+  .hidden { display: none; }
+  .err { color: #e0709a; font-size: 12px; margin-top: 10px; min-height: 16px; }
+  .share-out { font-size: 12px; color: #7a6588; margin-top: 8px; word-break: break-all; background: #fff; border-radius: 12px; padding: 10px; }
 </style>
 </head>
 <body>
+<div class="deco" style="width:220px;height:220px;top:-60px;left:-60px;"></div>
+<div class="deco" style="width:160px;height:160px;bottom:120px;right:-50px;"></div>
+<div class="zodiac-badge zb-tl">♐</div>
+<div class="zodiac-badge zb-bl">♋</div>
 
-<div id="input-view">
-  <span class="badge">仅供娱乐 · 不构成任何真实预测</span>
-  <h1>今日好运指数</h1>
-  <p class="sub">输入你的生辰，按传统黄历干支历法计算今日能量<br>同一生辰每天结果固定，测完可以和朋友对比～</p>
-
-  <div class="card">
-    <label>你的生日</label>
-    <input type="date" id="birth" max="2026-12-31" min="1940-01-01">
-    <label>出生时辰（八字需要，不知道选「不确定」）</label>
-    <select id="hour">
-      <option value="unknown">不确定 / 忘了</option>
-      <option value="23-01">子时 23:00-01:00</option>
-      <option value="01-03">丑时 01:00-03:00</option>
-      <option value="03-05">寅时 03:00-05:00</option>
-      <option value="05-07">卯时 05:00-07:00</option>
-      <option value="07-09">辰时 07:00-09:00</option>
-      <option value="09-11">巳时 09:00-11:00</option>
-      <option value="11-13">午时 11:00-13:00</option>
-      <option value="13-15">未时 13:00-15:00</option>
-      <option value="15-17">申时 15:00-17:00</option>
-      <option value="17-19">酉时 17:00-19:00</option>
-      <option value="19-21">戌时 19:00-21:00</option>
-      <option value="21-23">亥时 21:00-23:00</option>
-    </select>
-    <label>性别（影响解读口吻）</label>
-    <select id="gender">
-      <option value="x">保密</option>
-      <option value="f">女生</option>
-      <option value="m">男生</option>
-    </select>
-    <button id="go-btn">✨ 测今日好运</button>
-    <div id="msg" style="color:#f08a8a;font-size:13px;margin-top:10px;min-height:18px;"></div>
-  </div>
-  <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎，结果仅供参考消遣。<br>请勿将结果作为任何现实决策依据。</p>
-</div>
-
-<div id="result-view" class="hidden">
-  <span class="badge" id="date-tag"></span>
-  <h1>你的今日运势</h1>
-  <div class="card" style="text-align:center">
-    <div style="font-size:12px;color:var(--muted);margin-bottom:6px" id="profile-line"></div>
-    <div class="score-ring" id="ring">
-      <div class="score-num" id="score">0</div>
-      <div class="score-label">今日好运指数</div>
+<div class="wrap">
+  <!-- ============ 输入页 ============ -->
+  <div id="input-view">
+    <span class="disclaimer-tag">仅供娱乐 · 不构成任何真实预测</span>
+    <h1>每日运势</h1>
+    <p class="subtitle">笑着看看运势信息，可供每日参考</p>
+    <div class="phone-card">
+      <div class="field">
+        <label>你的生日</label>
+        <input type="date" id="birth" min="1940-01-01" max="2026-12-31">
+      </div>
+      <div class="field">
+        <label>出生时辰（不知道可选「不确定」）</label>
+        <select id="hour">
+          <option value="unknown">不确定 / 忘了</option>
+          <option value="23-01">子时 23:00-01:00</option>
+          <option value="01-03">丑时 01:00-03:00</option>
+          <option value="03-05">寅时 03:00-05:00</option>
+          <option value="05-07">卯时 05:00-07:00</option>
+          <option value="07-09">辰时 07:00-09:00</option>
+          <option value="09-11">巳时 09:00-11:00</option>
+          <option value="11-13">午时 11:00-13:00</option>
+          <option value="13-15">未时 13:00-15:00</option>
+          <option value="15-17">申时 15:00-17:00</option>
+          <option value="17-19">酉时 17:00-19:00</option>
+          <option value="19-21">戌时 19:00-21:00</option>
+          <option value="21-23">亥时 21:00-23:00</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>性别</label>
+        <select id="gender">
+          <option value="x">保密</option>
+          <option value="f">女生</option>
+          <option value="m">男生</option>
+        </select>
+      </div>
+      <button class="go-btn" id="go-btn">✨ 开始测算</button>
+      <div class="err" id="msg"></div>
     </div>
-    <div class="verdict" id="verdict"></div>
-    <div class="desc" id="summary"></div>
-    <div class="rule-tag" id="rule-line"></div>
+    <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎<br>请勿将结果作为任何现实决策依据 · 本页不保存任何个人信息</p>
   </div>
 
-  <div class="card">
-    <div class="item"><span>💰 财运</span><span class="stars" id="s-wealth"></span></div>
-    <div class="item"><span>🍀 贵人运</span><span class="stars" id="s-noble"></span></div>
-    <div class="item"><span>❤️ 桃花运</span><span class="stars" id="s-love"></span></div>
-    <div class="item"><span>⚡ 行动力</span><span class="stars" id="s-action"></span></div>
+  <!-- ============ 结果页 ============ -->
+  <div id="result-view" class="hidden">
+    <span class="disclaimer-tag">仅供娱乐 · 不构成任何真实预测</span>
+    <h1>运势详情</h1>
+    <p class="subtitle" id="profile-line"></p>
+
+    <div class="phone-card">
+      <div class="date-tabs" id="date-tabs"></div>
+      <div class="day-title"><span id="day-label">今日运势</span><span class="day-stars" id="day-stars"></span></div>
+      <div class="dims">
+        <div class="dim"><div class="dim-head"><span>💗 爱情</span><span class="dim-pct c-pink-text" id="p-love" style="color:#ff7eb3"></span></div><div class="bar"><div class="bar-fill c-pink" id="b-love"></div></div></div>
+        <div class="dim"><div class="dim-head"><span>💰 财富</span><span class="dim-pct" id="p-wealth" style="color:#ffa940"></span></div><div class="bar"><div class="bar-fill c-orange" id="b-wealth"></div></div></div>
+        <div class="dim"><div class="dim-head"><span>💼 事业</span><span class="dim-pct" id="p-career" style="color:#6cb6ff"></span></div><div class="bar"><div class="bar-fill c-blue" id="b-career"></div></div></div>
+        <div class="dim"><div class="dim-head"><span>🍀 贵人</span><span class="dim-pct" id="p-noble" style="color:#73d13d"></span></div><div class="bar"><div class="bar-fill c-green" id="b-noble"></div></div></div>
+        <div class="dim"><div class="dim-head"><span>📖 学业</span><span class="dim-pct" id="p-study" style="color:#9254de"></span></div><div class="bar"><div class="bar-fill c-purple" id="b-study"></div></div></div>
+        <div class="dim"><div class="dim-head"><span>💬 社交</span><span class="dim-pct" id="p-social" style="color:#13c2c2"></span></div><div class="bar"><div class="bar-fill c-teal" id="b-social"></div></div></div>
+      </div>
+    </div>
+
+    <div class="phone-card">
+      <div class="lucky-grid">
+        <div class="lucky-card lc-pink"><div class="lc-label">幸运颜色</div><div class="lc-value" id="l-color"></div><div class="lc-icon">🎨</div></div>
+        <div class="lucky-card lc-purple"><div class="lc-label">幸运数字</div><div class="lc-value" id="l-num"></div><div class="lc-icon">#️⃣</div></div>
+        <div class="lucky-card lc-orange"><div class="lc-label">幸运方位</div><div class="lc-value" id="l-dir"></div><div class="lc-icon">🧭</div></div>
+        <div class="lucky-card lc-green"><div class="lc-label">今日建星</div><div class="lc-value" id="l-jx"></div><div class="lc-icon">📅</div></div>
+      </div>
+    </div>
+
+    <div class="text-block">
+      <div class="tb-title">整体运势</div>
+      <div class="tb-body" id="summary"></div>
+      <div class="rule-tag" id="rule-line"></div>
+    </div>
+
+    <button class="share-btn" onclick="share()">📲 复制结果分享给朋友</button>
+    <div class="share-out hidden" id="share-out"></div>
+
+    <div class="upsell">
+      <h3>想认识「命盘里的自己」吗？</h3>
+      <p>你的生辰里藏着一套完整的<b>天生搞钱方式分析</b><br>按紫微命盘规则排盘解读 · 同一生辰结果恒定</p>
+      <button id="upsell-btn">🔓 解锁完整报告 ¥1.9</button>
+    </div>
+
+    <button class="share-btn" onclick="back()">↩️ 重新输入</button>
+    <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎<br>请勿将结果作为任何现实决策依据 · 本页不保存任何个人信息</p>
   </div>
-
-  <div class="card">
-    <div class="tip-title">📅 今日黄历</div>
-    <div class="desc" id="almanac"></div>
-    <div class="tip-title">🔮 今日宜</div>
-    <div class="desc" id="do-list"></div>
-    <div class="tip-title">⚠️ 今日忌</div>
-    <div class="desc" id="dont-list"></div>
-    <div class="tip-title">🎨 幸运色 & 数字</div>
-    <div class="desc" id="lucky"></div>
-  </div>
-
-  <button class="share-btn" onclick="share()">📲 复制结果分享给朋友</button>
-  <div id="share-tip" style="color:var(--gold);font-size:13px;margin-top:10px;"></div>
-  <div id="share-text" style="color:var(--muted);font-size:13px;margin-top:6px;line-height:1.7;word-break:break-all;"></div>
-
-  <div class="upsell">
-    <h3>想看更深度的吗？</h3>
-    <p>你的生辰里还藏着一套完整的<br><b style="color:var(--gold)">「天生搞钱方式」分析</b><br>——按紫微命盘规则排盘解读，同一生辰结果永远一致</p>
-    <button id="upsell-btn">🔓 解锁完整报告 ¥1.9</button>
-  </div>
-
-  <button class="share-btn" onclick="back()">↩️ 重新输入</button>
-  <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎，结果仅供参考消遣。<br>请勿将结果作为任何现实决策依据。本页不保存任何个人信息。</p>
 </div>
 
 <script>
-// ================= 干支历法引擎 (传统规则, 非随机) =================
+// ================= 干支历法引擎 =================
 const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
 const ZHI = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
-const GAN_WUXING = ["木","木","火","火","土","土","金","金","水","水"]; // 甲乙木 丙丁火 戊己土 庚辛金 壬癸水
-const ZHI_WUXING = ["水","土","木","木","土","火","火","土","金","金","土","水"]; // 子水 丑土 寅卯木 辰土 巳午火 未土 申酉金 戌土 亥水
+const GAN_WUXING = ["木","木","火","火","土","土","金","金","水","水"];
+const ZHI_WUXING = ["水","土","木","木","土","火","火","土","金","金","土","水"];
 const SHENGXIAO = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"];
 
-// 儒略日: 公历 -> JDN
 function toJDN(y, m, d) {
   const a = Math.floor((14 - m) / 12);
-  const y2 = y + 4800 - a;
-  const m2 = m + 12 * a - 3;
+  const y2 = y + 4800 - a, m2 = m + 12 * a - 3;
   return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
 }
-
-// 干支纪日锚点: 1949-10-01 为甲子日
-const ANCHOR_JDN = toJDN(1949, 10, 1);
+const ANCHOR_JDN = toJDN(1949, 10, 1); // 甲子日锚点
 function dayGZ(y, m, d) {
   const idx = ((toJDN(y, m, d) - ANCHOR_JDN) % 60 + 60) % 60;
-  return { gan: idx % 10, zhi: idx % 12, idx: idx };
+  return { gan: idx % 10, zhi: idx % 12, idx };
 }
 function gzName(i) { return GAN[i % 10] + ZHI[i % 12]; }
-
-// 年干支 (以立春2月4日为界, 近似)
 function yearGZ(y, m) {
-  const yy = (m >= 2 || m <= 1 && false) ? y : y; // 简化: 2月起算当年
-  const y2 = m >= 2 ? yy : yy - 1;
-  const idx = ((y2 - 1984) % 60 + 60) % 60; // 1984年为甲子年
-  return { name: gzName(idx), zhi: idx % 12, idx: idx };
+  const y2 = m >= 2 ? y : y - 1;
+  const idx = ((y2 - 1984) % 60 + 60) % 60;
+  return { name: gzName(idx), zhi: idx % 12 };
 }
-
-// 月支 (按节气近似日期)
 function monthZhi(m, d) {
-  // 节气近似: 立春2/4 惊蛰3/6 清明4/5 立夏5/6 芒种6/6 小暑7/7 立秋8/8 白露9/8 寒露10/8 立冬11/7 大雪12/7 小寒1/6
   const terms = [[2,4,2],[3,6,3],[4,5,4],[5,6,5],[6,6,6],[7,7,7],[8,8,8],[9,8,9],[10,8,10],[11,7,11],[12,7,12]];
-  let mz = 1; // 1月(小寒后~立春前)为丑月(索引1)
-  // 节气后进入对应地支月: 立春(2/4)起为寅月(索引2), 立冬(11/7)起为亥月(索引11)
-  if (m === 1) return d >= 6 ? 1 : 1; // 小寒后丑月
-  for (const [tm, td, idx] of terms) {
-    if (m > tm || (m === tm && d >= td)) mz = idx;
-  }
+  if (m === 1) return 1;
+  let mz = 1;
+  for (const [tm, td, idx] of terms) if (m > tm || (m === tm && d >= td)) mz = idx;
   return mz;
 }
-
-// 十二建星: 建除满平定执破危成收开闭
 const JIANXING = ["建","除","满","平","定","执","破","危","成","收","开","闭"];
 function jianXing(y, m, d) {
-  const mz = monthZhi(m, d);         // 月支索引
-  const dz = dayGZ(y, m, d).zhi;     // 日支索引
-  return JIANXING[((dz - mz) % 12 + 12) % 12];
+  return JIANXING[((dayGZ(y, m, d).zhi - monthZhi(m, d)) % 12 + 12) % 12];
 }
-
-// 建星 -> 宜忌 (传统黄历通行口径, 娱乐化精简)
 const JIAN_RULE = {
-  "建": { yi: ["出行", "求职", "开始新计划"], ji: ["动土", "与人争执"], tip: "建日万物始生，宜开新局" },
-  "除": { yi: ["打扫除旧", "看病调理", "断舍离"], ji: ["签约", "远行"], tip: "除日宜除旧布新" },
-  "满": { yi: ["聚会", "置办物品", "庆祝"], ji: ["就医", "打官司"], tip: "满日丰盈，忌过度" },
-  "平": { yi: ["日常事务", "修整", "平稳推进"], ji: ["大额消费", "重大决定"], tip: "平日守成，稳字当头" },
-  "定": { yi: ["签约", "定计划", "告白"], ji: ["搬家", "远行"], tip: "定日宜定事宜" },
-  "执": { yi: ["执行既定计划", "健身", "专注攻坚"], ji: ["开新项目"], tip: "执日宜执守不宜开新" },
-  "破": { yi: ["破除坏习惯", "清理债务"], ji: ["签约", "开业", "嫁娶", "远行"], tip: "破日诸事不宜大事，宜破不宜立" },
-  "危": { yi: ["安坐学习", "复盘"], ji: ["冒险", "登高", "冲动消费"], tip: "危日宜静不宜动" },
-  "成": { yi: ["完成收尾", "签约", "庆祝成果"], ji: ["诉诸争执"], tip: "成日诸事可成" },
-  "收": { yi: ["收款", "收纳", "总结"], ji: ["开启新事务", "置办大件"], tip: "收日宜收不宜放" },
-  "开": { yi: ["开业", "面试", "社交", "开始学习"], ji: ["安葬", "保守秘密"], tip: "开日开放，宜动不宜静" },
-  "闭": { yi: ["休息", "静养", "闭门复盘"], ji: ["出行", "社交", "开新局"], tip: "闭日宜闭不宜开" }
+  "建": { yi: ["出行","求职","开始新计划"], ji: ["动土","与人争执"], tip: "建日万物始生，宜开新局" },
+  "除": { yi: ["打扫除旧","看病调理","断舍离"], ji: ["签约","远行"], tip: "除日宜除旧布新" },
+  "满": { yi: ["聚会","置办物品","庆祝"], ji: ["就医","打官司"], tip: "满日丰盈，忌过度" },
+  "平": { yi: ["日常事务","修整","平稳推进"], ji: ["大额消费","重大决定"], tip: "平日守成，稳字当头" },
+  "定": { yi: ["签约","定计划","告白"], ji: ["搬家","远行"], tip: "定日宜定事宜" },
+  "执": { yi: ["执行既定计划","健身","专注攻坚"], ji: ["开新项目"], tip: "执日宜执守不宜开新" },
+  "破": { yi: ["破除坏习惯","清理债务"], ji: ["签约","开业","嫁娶","远行"], tip: "破日宜破不宜立" },
+  "危": { yi: ["安坐学习","复盘"], ji: ["冒险","登高","冲动消费"], tip: "危日宜静不宜动" },
+  "成": { yi: ["完成收尾","签约","庆祝成果"], ji: ["诉诸争执"], tip: "成日诸事可成" },
+  "收": { yi: ["收款","收纳","总结"], ji: ["开启新事务","置办大件"], tip: "收日宜收不宜放" },
+  "开": { yi: ["开业","面试","社交","开始学习"], ji: ["安葬","保守秘密"], tip: "开日开放，宜动不宜静" },
+  "闭": { yi: ["休息","静养","闭门复盘"], ji: ["出行","社交","开新局"], tip: "闭日宜闭不宜开" }
 };
-
-// 五行关系: 返回 [{rel, desc}] 相对 dayGan
-function wuxingRelation(myGan, todayGan) {
-  const my = GAN_WUXING[myGan], to = GAN_WUXING[todayGan];
+function wuxingRel(myGan, todayGan) {
   const order = ["木","火","土","金","水"];
-  const diff = (order.indexOf(to) - order.indexOf(my) + 5) % 5;
-  // diff 0=同 1=我生 2=我克 3=克我 4=生我
+  const diff = (order.indexOf(GAN_WUXING[todayGan]) - order.indexOf(GAN_WUXING[myGan]) + 5) % 5;
   return [
-    { rel: "同我", key: 0, level: 62, label: "比肩帮身" },
-    { rel: "我生", key: 1, level: 55, label: "泄气付出" },
-    { rel: "我克", key: 2, level: 70, label: "掌控得财" },
-    { rel: "克我", key: 3, level: 42, label: "受制谨慎" },
-    { rel: "生我", key: 4, level: 78, label: "得生得助" }
+    { key: 0, level: 62, label: "比肩帮身" },
+    { key: 1, level: 55, label: "泄气付出" },
+    { key: 2, level: 70, label: "掌控得财" },
+    { key: 3, level: 42, label: "受制谨慎" },
+    { key: 4, level: 78, label: "得生得助" }
   ][diff];
 }
-
-// 确定性微调 (同命盘同日固定, 使四维有差异)
 function seededRandom(seedStr) {
   let h = 1779033703 ^ seedStr.length;
   for (let i = 0; i < seedStr.length; i++) {
@@ -315,117 +315,129 @@ function seededRandom(seedStr) {
   };
 }
 
+// ================= UI =================
 const GENDER_TONE = { f: "姐妹", m: "兄弟", x: "朋友" };
-function stars(n) { return "★".repeat(n) + "☆".repeat(5 - n); }
-function showMsg(t) { const m = document.getElementById("msg"); if (m) m.textContent = t; }
+const $ = id => document.getElementById(id);
+function showMsg(t) { $("msg").textContent = t; }
 
-function run() {
-  let birth = document.getElementById("birth").value;
-  if (!birth) {
-    birth = "1998-06-15";
-    showMsg("未选生日，已用示例生日 1998-06-15 演示");
-  }
-  const gender = document.getElementById("gender").value;
-  const hour = document.getElementById("hour").value;
+let CUR = { birth: "", hour: "", gender: "" }; // 当前用户信息(仅页面内存, 不存储)
+
+function computeFor(dateStr, birth, hour) {
+  const [ty, tm, td] = dateStr.split("-").map(Number);
   const [by, bm, bd] = birth.split("-").map(Number);
-  const today = new Date();
-  const ty = today.getFullYear(), tm = today.getMonth() + 1, td = today.getDate();
-  const dateStr = `${ty}-${String(tm).padStart(2, "0")}-${String(td).padStart(2, "0")}`;
-
-  // ---- 传统规则计算 ----
-  const myDay = dayGZ(by, bm, bd);              // 用户日柱 (日主)
-  const todayDay = dayGZ(ty, tm, td);           // 今日日柱
-  const jx = jianXing(ty, tm, td);              // 十二建星
+  const myDay = dayGZ(by, bm, bd);
+  const todayDay = dayGZ(ty, tm, td);
+  const jx = jianXing(ty, tm, td);
   const rule = JIAN_RULE[jx];
-  const rel = wuxingRelation(myDay.gan, todayDay.gan); // 日主与今日干支关系
-  const yGZ = yearGZ(ty, tm);
-
-  // 综合分 = 建星基础分(60%权重) + 五行关系分(40%权重), 各自规则映射
+  const rel = wuxingRel(myDay.gan, todayDay.gan);
   const jianScore = { "建":72,"除":65,"满":70,"平":60,"定":72,"执":65,"破":45,"危":48,"成":80,"收":62,"开":75,"闭":50 }[jx];
   const score = Math.round(jianScore * 0.6 + rel.level * 0.4);
-
-  // 命主五行与幸运色 (按日主五行, 传统配色)
-  const wx = GAN_WUXING[myDay.gan];
-  const colorMap = { "木": "青色/绿色系", "火": "红色/橙色系", "土": "黄色/棕色系", "金": "白色/金色系", "水": "黑色/蓝色系" };
-  const numMap = { "木": [3, 8], "火": [2, 7], "土": [5, 10], "金": [4, 9], "水": [1, 6] };
-
-  // 展示
-  document.getElementById("date-tag").textContent = dateStr + " · 仅供娱乐";
-  const hourName = { "unknown": "时辰未提供" };
-  document.querySelectorAll("#hour option").forEach(o => hourName[o.value] = o.textContent.split(" ")[0]);
-  document.getElementById("profile-line").textContent =
-    `测算档案：${birth} · ${hourName[hour] || hour} · ${gender === "f" ? "女" : gender === "m" ? "男" : "保密"}（本页不保存任何信息）`;
-  document.getElementById("score").textContent = score;
-  document.getElementById("ring").style.setProperty("--s", score);
-
-  const verdictText = score >= 75 ? "🌟 大吉 · 星象超燃" : score >= 62 ? "☀️ 小吉 · 顺水行舟" : score >= 52 ? "🌤 平稳 · 稳字当头" : "🌥 微凉 · 少动多看";
-  document.getElementById("verdict").textContent = verdictText;
-
-  document.getElementById("summary").textContent =
-    `${GENDER_TONE[gender]}，你的日主是「${GAN[myDay.gan]}${wx}」，今日为「${gzName(todayDay.idx)}」日，与你的日主构成【${rel.label}】关系——` +
-    (rel.key === 4 ? "今日得生得助，贵人能量强，适合推进重要的事。" :
-     rel.key === 2 ? "今日你占主导位，适合谈钱谈合作，掌控节奏。" :
-     rel.key === 0 ? "今日能量与你同频，稳扎稳打就好。" :
-     rel.key === 1 ? "今日宜输出宜表达，但注意别过度消耗自己。" :
-     "今日受制之日，少出手多观察，保存实力最重要。") +
-    ` 今日建星「${jx}」——${rule.tip}。`;
-
-  document.getElementById("rule-line").textContent =
-    `计算依据：今日${gzName(todayDay.idx)}日 · ${yGZ.name}年 · 建星「${jx}」 · 日主${GAN[myDay.gan]}${wx} vs 今日${GAN_WUXING[todayDay.gan]} → ${rel.label}`;
-
-  // 四维: 在综合分基础上按规则微调 (确定性)
-  const rand = seededRandom(birth + "|" + hour + "|" + dateStr + "|dim");
-  const dimScore = (bias) => Math.max(1, Math.min(5, Math.round((score / 100) * 5 + bias + (rand() * 1.4 - 0.7))));
-  // 财运偏向"我克/成/开"日, 贵人偏向"生我/满/成", 桃花偏向"定/开", 行动偏向"建/执/开"
+  const rand = seededRandom(birth + "|" + hour + "|" + dateStr + "|dims");
   const jxBoost = { "建":1,"除":0,"满":0,"平":-1,"定":0,"执":1,"破":-2,"危":-1,"成":1,"收":0,"开":1,"闭":-1 };
-  document.getElementById("s-wealth").textContent = stars(dimScore(rel.key === 2 ? 1 : rel.key === 3 ? -1 : 0 + jxBoost[jx] * 0.5));
-  document.getElementById("s-noble").textContent = stars(dimScore(rel.key === 4 ? 1 : jxBoost[jx] * 0.5));
-  document.getElementById("s-love").textContent = stars(dimScore(jx === "定" || jx === "满" ? 1 : jxBoost[jx] * 0.5));
-  document.getElementById("s-action").textContent = stars(dimScore(jxBoost[jx]));
+  const d6 = (b) => Math.max(35, Math.min(96, Math.round(score + b + (rand() * 18 - 9))));
+  const dims = {
+    love:   d6(jx === "定" || jx === "满" ? 4 : -2 + jxBoost[jx]),
+    wealth: d6(rel.key === 2 ? 6 : rel.key === 3 ? -6 : jxBoost[jx] * 2),
+    career: d6(jxBoost[jx] * 3),
+    noble:  d6(rel.key === 4 ? 6 : jxBoost[jx] * 2),
+    study:  d6(jx === "危" || jx === "闭" ? 4 : -1),
+    social: d6(jx === "开" || jx === "满" ? 4 : -2 + jxBoost[jx])
+  };
+  return { dateStr, ty, tm, td, myDay, todayDay, jx, rule, rel, score, dims };
+}
 
-  // 黄历区
-  document.getElementById("almanac").textContent =
-    `今日 ${dateStr}｜${yGZ.name}年 · ${gzName(todayDay.idx)}日 · 十二建星「${jx}」｜生肖日：${SHENGXIAO[todayDay.zhi]}`;
+const HOURS = { "unknown": "时辰未提供", "23-01": "子时", "01-03": "丑时", "03-05": "寅时", "05-07": "卯时", "07-09": "辰时", "09-11": "巳时", "11-13": "午时", "13-15": "未时", "15-17": "申时", "17-19": "酉时", "19-21": "戌时", "21-23": "亥时" };
 
-  // 宜忌: 建星规则 + 确定性补充
-  const rand2 = seededRandom(birth + "|" + hour + "|" + dateStr + "|yiji");
-  const extraYi = ["多喝水早休息", "整理待办清单", "给家人打个电话", "学习半小时", "散步二十分钟"];
-  const extraJi = ["熬夜刷手机", "与人硬刚", "深夜剁手", "过度承诺"];
-  const pickN = (arr, n) => { const a = [...arr]; const out = []; for (let i = 0; i < n; i++) out.push(a.splice(Math.floor(rand2() * a.length), 1)[0]); return out; };
-  document.getElementById("do-list").innerHTML =
-    "✅ " + rule.yi.map(s => s).join("、") + "<br>✅ " + pickN(extraYi, 2).join("<br>✅ ");
-  document.getElementById("dont-list").innerHTML =
-    "🚫 " + rule.ji.join("、") + "<br>🚫 " + pickN(extraJi, 1).join("<br>🚫 ");
+function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
 
-  document.getElementById("lucky").textContent = `按你日主五行（${wx}）：幸运色 ${colorMap[wx]} ｜ 幸运数字 ${numMap[wx].join("、")}`;
+function render(dateStr) {
+  const r = computeFor(dateStr, CUR.birth, CUR.hour);
+  const today = fmtDate(new Date());
+  const diffDays = Math.round((new Date(dateStr) - new Date(today)) / 86400000);
+  const label = diffDays === 0 ? "今日运势" : diffDays === 1 ? "明日运势" : diffDays === -1 ? "昨日运势" : (diffDays > 0 ? `后${diffDays}日运势` : `前${-diffDays}日运势`);
+  $("day-label").textContent = label;
 
-  document.getElementById("input-view").classList.add("hidden");
-  document.getElementById("result-view").classList.remove("hidden");
+  const vmap = [["p-love","b-love",r.dims.love],["p-wealth","b-wealth",r.dims.wealth],["p-career","b-career",r.dims.career],["p-noble","b-noble",r.dims.noble],["p-study","b-study",r.dims.study],["p-social","b-social",r.dims.social]];
+  for (const [p, b, v] of vmap) { $(p).textContent = v + "%"; $(b).style.width = v + "%"; }
+  const avg = Math.round((r.dims.love + r.dims.wealth + r.dims.career + r.dims.noble + r.dims.study + r.dims.social) / 6);
+  $("day-stars").textContent = "★".repeat(Math.max(1, Math.min(5, Math.round(avg / 20)))) + "☆".repeat(5 - Math.max(1, Math.min(5, Math.round(avg / 20))));
+
+  // 幸运物: 按日主五行规则 + 建星
+  const wx = GAN_WUXING[r.myDay.gan];
+  const colorMap = { "木": "青色 / 绿系", "火": "红色 / 橙系", "土": "黄色 / 米系", "金": "白色 / 金系", "水": "黑色 / 蓝系" };
+  const numMap = { "木": "3、8", "火": "2、7", "土": "5、10", "金": "4、9", "水": "1、6" };
+  const dirMap = { "木": "东方", "火": "南方", "土": "中央/本地", "金": "西方", "水": "北方" };
+  $("l-color").textContent = colorMap[wx];
+  $("l-num").textContent = numMap[wx];
+  $("l-dir").textContent = dirMap[wx];
+  $("l-jx").textContent = `${r.jx}日 · ${SHENGXIAO[r.todayDay.zhi]}日`;
+
+  // 整体文案
+  const tone = GENDER_TONE[CUR.gender];
+  const relText = {
+    4: "今天你的日主得今日干支相生，属于「得生得助」的日子，贵人能量强",
+    2: "今天你日主克制今日五行，处于「掌控位」，谈钱谈合作你说了算",
+    0: "今天日主与今日五行同气，能量同频，稳扎稳打最舒服",
+    1: "今天你的日主在「泄气位」，适合输出表达，但要控制节奏别硬撑",
+    3: "今天今日五行克制你的日主，属于「受制日」，少出手、多观察"
+  }[r.rel.key];
+  $("summary").textContent =
+    `${tone}，${relText}。今日建星「${r.jx}」——${r.rule.tip}，所以${r.score >= 70 ? "整体适合主动推进，尤其是" + r.rule.yi[0] + "这类事" : r.score >= 55 ? "适合按计划走，遇到" + r.rule.ji[0] + "相关的事缓一缓" : "今天把节奏放慢，把" + r.rule.yi[0] + "做完就足够了"}。` +
+    `黄历显示今日${gzName(r.todayDay.idx)}日（${SHENGXIAO[r.todayDay.zhi]}日），冲${SHENGXIAO[(r.todayDay.zhi + 6) % 12]}，属${SHENGXIAO[(r.todayDay.zhi + 6) % 12]}的朋友今天做事多留个心眼。`;
+
+  $("rule-line").textContent = `计算依据：${gzName(r.todayDay.idx)}日 · ${yearGZ(r.ty, r.tm).name}年 · 建星「${r.jx}」 · 日主${GAN[r.myDay.gan]}${wx} vs ${GAN_WUXING[r.todayDay.gan]} → ${r.rel.label}`;
+
+  $("profile-line").textContent =
+    `${CUR.birth} · ${HOURS[CUR.hour] || CUR.hour} · ${CUR.gender === "f" ? "女" : CUR.gender === "m" ? "男" : "保密"} · ${dateStr}（仅供娱乐，本页不保存信息）`;
+
+  // 日期 tabs
+  const tabs = $("date-tabs");
+  tabs.innerHTML = "";
+  for (const off of [-2, -1, 0, 1, 2]) {
+    const d = new Date(); d.setDate(d.getDate() + off);
+    const ds = fmtDate(d);
+    const b = document.createElement("button");
+    b.className = "tab" + (ds === dateStr ? " active" : "");
+    b.textContent = off === 0 ? "今日" : off === 1 ? "明日" : off === -1 ? "昨日" : off === -2 ? "前日" : "后日";
+    b.onclick = () => { render(ds); window.__last = { date: ds, score: r.score }; };
+    tabs.appendChild(b);
+  }
+
+  window.__last = { date: dateStr, score: r.score, label };
+}
+
+function run() {
+  let birth = $("birth").value;
+  if (!birth) { birth = "1998-06-15"; showMsg("未选生日，已用示例生日 1998-06-15 演示"); }
+  CUR.birth = birth;
+  CUR.hour = $("hour").value;
+  CUR.gender = $("gender").value;
+  render(fmtDate(new Date()));
+  $("input-view").classList.add("hidden");
+  $("result-view").classList.remove("hidden");
   window.scrollTo(0, 0);
-  window.__lastResult = { date: dateStr, score, verdict: verdictText };
 }
 
 function share() {
-  const r = window.__lastResult;
-  const text = `我在「今日好运指数」测了 ${r.date} 的运势：${r.score} 分 ${r.verdict}\n按传统黄历干支计算，快来测你的：`;
-  try { navigator.clipboard.writeText(text); showShareTip(text); }
-  catch (e) { showShareTip(text); }
-}
-function showShareTip(text) {
-  const el = document.getElementById("share-tip");
-  if (el) { el.textContent = "👇 分享文案已生成，长按复制："; document.getElementById("share-text").textContent = text; }
-  else { window.prompt("复制以下文案分享：", text); }
+  const r = window.__last;
+  const text = `我在「每日运势」测了 ${r.date} 的运势：综合 ${r.score} 分\n按传统黄历干支规则计算，同一生辰结果恒定，快来测你的：`;
+  try { navigator.clipboard.writeText(text); } catch (e) {}
+  const out = $("share-out");
+  out.classList.remove("hidden");
+  out.textContent = "👇 分享文案（长按复制）：\n" + text;
 }
 function back() {
-  document.getElementById("result-view").classList.add("hidden");
-  document.getElementById("input-view").classList.remove("hidden");
+  $("result-view").classList.add("hidden");
+  $("input-view").classList.remove("hidden");
   window.scrollTo(0, 0);
 }
-document.getElementById("go-btn").addEventListener("click", run);
-document.getElementById("upsell-btn").addEventListener("click", function () {
-  document.getElementById("share-tip").textContent = "💡 付费模块开发中——上线后此处将跳转店铺商品页";
+$("go-btn").addEventListener("click", run);
+$("upsell-btn").addEventListener("click", function () {
+  const out = $("share-out");
+  out.classList.remove("hidden");
+  out.textContent = "💡 付费完整报告模块开发中，上线后此处跳转商品页";
 });
-document.getElementById("birth").addEventListener("change", function () { showMsg(""); });
+$("birth").addEventListener("change", () => showMsg(""));
 </script>
 </body>
 </html>
