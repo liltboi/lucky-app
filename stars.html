@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>星座运势 · 今日好运研究所</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(160deg, #ffe9f1 0%, #ffd6e8 40%, #e8d5ff 100%);
+    min-height: 100vh; max-width: 480px; margin: 0 auto;
+    padding: 28px 18px 60px; color: #4a3b52; position: relative;
+  }
+  .disclaimer-tag {
+    display: inline-block; font-size: 10px; color: #b58ab0;
+    background: rgba(255,255,255,.6); border-radius: 999px; padding: 3px 10px; margin-bottom: 14px;
+  }
+  h1 { font-size: 30px; letter-spacing: 4px; text-align: center; color: #3d2e46; font-weight: 800; text-shadow: 0 2px 0 #fff, 0 4px 14px rgba(233,142,192,.35); }
+  .subtitle { text-align: center; font-size: 12px; color: #9a7d96; margin: 8px 0 24px; }
+  .phone-card {
+    background: rgba(255,255,255,.72); backdrop-filter: blur(12px);
+    border-radius: 26px; padding: 22px 18px; box-shadow: 0 12px 40px rgba(220,120,180,.2); margin-bottom: 18px;
+  }
+  .sign-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .sign-cell {
+    text-align: center; padding: 10px 2px; border-radius: 14px; cursor: pointer;
+    background: rgba(255,255,255,.7); transition: transform .12s;
+  }
+  .sign-cell:active { transform: scale(.95); }
+  .sign-cell.active { background: linear-gradient(120deg, #ff9ec7, #c9a7ff); box-shadow: 0 4px 14px rgba(233,142,192,.4); }
+  .sign-cell.active .s-name, .sign-cell.active .s-icon { filter: none; }
+  .sign-cell.active .s-name { color: #fff; }
+  .s-icon { font-size: 20px; }
+  .s-name { font-size: 11px; color: #6b5570; margin-top: 3px; }
+  .date-tabs { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
+  .tab { padding: 6px 13px; border-radius: 999px; font-size: 12px; background: rgba(255,255,255,.8); color: #9a7d96; cursor: pointer; border: none; }
+  .tab.active { background: linear-gradient(120deg, #ff9ec7, #c9a7ff); color: #fff; font-weight: 600; }
+  .day-title { font-size: 17px; font-weight: 700; color: #3d2e46; text-align: center; margin-bottom: 4px; }
+  .day-sub { font-size: 12px; color: #9a7d96; text-align: center; margin-bottom: 12px; }
+  .dims { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+  .dim .dim-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+  .bar { height: 7px; border-radius: 999px; background: rgba(255,255,255,.9); overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width 1s ease; }
+  .c-pink  { background: linear-gradient(90deg, #ffb3d1, #ff7eb3); }
+  .c-blue  { background: linear-gradient(90deg, #a8d8ff, #6cb6ff); }
+  .c-orange{ background: linear-gradient(90deg, #ffd591, #ffa940); }
+  .c-green { background: linear-gradient(90deg, #b7eb8f, #73d13d); }
+  .lucky-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .lucky-card { border-radius: 16px; padding: 12px; position: relative; }
+  .lc-pink { background: #ffe0ec; } .lc-purple { background: #ece0ff; }
+  .lc-orange { background: #fff0db; } .lc-green { background: #e2f7d9; }
+  .lc-label { font-size: 12px; color: #7a6588; margin-bottom: 4px; }
+  .lc-value { font-size: 14px; font-weight: 700; color: #4a3b52; }
+  .text-block { background: rgba(255,255,255,.72); border-radius: 22px; padding: 18px; }
+  .tb-title { font-size: 15px; font-weight: 700; color: #3d2e46; margin-bottom: 8px; }
+  .tb-body { font-size: 13px; line-height: 1.9; color: #6b5570; }
+  .back-link { display: block; text-align: center; margin-top: 16px; color: #9a7d96; font-size: 13px; text-decoration: none; }
+  .hidden { display: none; }
+  .footer { text-align: center; font-size: 10px; color: #b195ad; line-height: 1.8; margin-top: 26px; }
+</style>
+</head>
+<body>
+  <span class="disclaimer-tag">仅供娱乐 · 不构成任何真实预测</span>
+  <h1>星座运势</h1>
+  <p class="subtitle">选你的星座，看看今天星星怎么说</p>
+
+  <div class="phone-card" id="sign-card">
+    <div class="sign-grid" id="sign-grid"></div>
+    <div class="date-tabs" id="date-tabs" style="margin-top:16px"></div>
+    <div id="result">
+      <div class="day-title" id="day-title"></div>
+      <div class="day-sub" id="day-sub"></div>
+      <div class="dims">
+        <div class="dim"><div class="dim-head"><span>💗 爱情</span><span id="p-love" style="color:#ff7eb3;font-weight:700"></span></div><div class="bar"><div class="bar-fill c-pink" id="b-love"></div></div></div>
+        <div class="dim"><div class="dim-head"><span>💰 财富</span><span id="p-wealth" style="color:#ffa940;font-weight:700"></span></div><div class="bar"><div class="bar-fill c-orange" id="b-wealth"></div></div></div>
+        <div class="dim"><div class="dim-head"><span>💼 事业</span><span id="p-career" style="color:#6cb6ff;font-weight:700"></span></div><div class="bar"><div class="bar-fill c-blue" id="b-career"></div></div></div>
+        <div class="dim"><div class="dim-head"><span>📖 学业</span><span id="p-study" style="color:#73d13d;font-weight:700"></span></div><div class="bar"><div class="bar-fill c-green" id="b-study"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone-card">
+    <div class="lucky-grid">
+      <div class="lucky-card lc-pink"><div class="lc-label">幸运颜色</div><div class="lc-value" id="l-color"></div></div>
+      <div class="lucky-card lc-purple"><div class="lc-label">幸运数字</div><div class="lc-value" id="l-num"></div></div>
+      <div class="lucky-card lc-orange"><div class="lc-label">幸运时刻</div><div class="lc-value" id="l-time"></div></div>
+      <div class="lucky-card lc-green"><div class="lc-label">速配星座</div><div class="lc-value" id="l-mate"></div></div>
+    </div>
+  </div>
+
+  <div class="text-block">
+    <div class="tb-title">今日提示</div>
+    <div class="tb-body" id="summary"></div>
+  </div>
+
+  <a class="back-link" href="index.html">← 返回研究所</a>
+  <p class="footer">星座运势为娱乐化生成内容，同一星座同一天结果一致<br>请勿作为任何现实决策依据 · 本页不保存任何个人信息</p>
+
+<script>
+const SIGNS = [
+  ["aries", "白羊座", "♈", 3, 21, 4, 19], ["taurus", "金牛座", "♉", 4, 20, 5, 20],
+  ["gemini", "双子座", "♊", 5, 21, 6, 21], ["cancer", "巨蟹座", "♋", 6, 22, 7, 22],
+  ["leo", "狮子座", "♌", 7, 23, 8, 22], ["virgo", "处女座", "♍", 8, 23, 9, 22],
+  ["libra", "天秤座", "♎", 9, 23, 10, 23], ["scorpio", "天蝎座", "♏", 10, 24, 11, 22],
+  ["sagittarius", "射手座", "♐", 11, 23, 12, 21], ["capricorn", "摩羯座", "♑", 12, 22, 1, 19],
+  ["aquarius", "水瓶座", "♒", 1, 20, 2, 18], ["pisces", "双鱼座", "♓", 2, 19, 3, 20]
+];
+const ELEMENT = ["火","土","风","水","火","土","风","水","火","土","风","水"];
+const MODALITY = ["开创","固定","变动","开创","固定","变动","开创","固定","变动","开创","固定","变动"];
+
+function seededRandom(seedStr) {
+  let h = 1779033703 ^ seedStr.length;
+  for (let i = 0; i < seedStr.length; i++) {
+    h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return function () {
+    h = Math.imul(h ^ (h >>> 16), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+}
+
+let CUR_SIGN = -1;
+
+function buildSignGrid() {
+  const g = document.getElementById("sign-grid");
+  SIGNS.forEach((s, i) => {
+    const d = document.createElement("div");
+    d.className = "sign-cell";
+    d.innerHTML = `<div class="s-icon">${s[2]}</div><div class="s-name">${s[1].slice(0, 2)}</div>`;
+    d.addEventListener("click", () => { CUR_SIGN = i; renderTabs(); });
+    g.appendChild(d);
+  });
+}
+
+function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+
+function renderTabs() {
+  const tabs = document.getElementById("date-tabs");
+  tabs.innerHTML = "";
+  const mk = (off, label) => {
+    const d = new Date(); d.setDate(d.getDate() + off);
+    const b = document.createElement("button");
+    b.className = "tab" + (off === 0 ? " active" : "");
+    b.textContent = label;
+    b.addEventListener("click", () => { CUR_DATE = off; renderTabs(); });
+    tabs.appendChild(b);
+  };
+  mk(-1, "昨日"); mk(0, "今日"); mk(1, "明日");
+  render();
+}
+
+let CUR_DATE = 0;
+
+function computeFor(signIdx, dateStr) {
+  const s = SIGNS[signIdx];
+  const rand = seededRandom(s[0] + "|" + dateStr);
+  const base = 45 + Math.floor(rand() * 35); // 45-79
+  const dims = {
+    love:   Math.max(30, Math.min(95, base + Math.round(rand() * 24 - 12))),
+    wealth: Math.max(30, Math.min(95, base + Math.round(rand() * 24 - 12))),
+    career: Math.max(30, Math.min(95, base + Math.round(rand() * 24 - 12))),
+    study:  Math.max(30, Math.min(95, base + Math.round(rand() * 24 - 12)))
+  };
+  const colors = ["樱花粉","雾霾蓝","奶油白","薄荷绿","香芋紫","柠檬黄","珊瑚橙","雾灰"];
+  const times = ["清晨 7-9 点","上午 10-12 点","午后 2-4 点","傍晚 5-7 点","晚间 8-10 点"];
+  const mateIdx = (signIdx + 4 + Math.floor(rand() * 4)) % 12;
+  return { dims, color: colors[Math.floor(rand() * colors.length)],
+    num: 1 + Math.floor(rand() * 30), time: times[Math.floor(rand() * times.length)],
+    mate: SIGNS[mateIdx][1].slice(0, 2), element: ELEMENT[signIdx], modality: MODALITY[signIdx] };
+}
+
+function render() {
+  const grid = document.getElementById("sign-grid");
+  [...grid.children].forEach((c, i) => c.classList.toggle("active", i === CUR_SIGN));
+  if (CUR_SIGN < 0) {
+    document.getElementById("result").style.display = "none";
+    document.getElementById("day-title").textContent = "";
+    document.getElementById("day-sub").textContent = "";
+    return;
+  }
+  document.getElementById("result").style.display = "";
+  const d = new Date(); d.setDate(d.getDate() + CUR_DATE);
+  const ds = fmtDate(d);
+  const r = computeFor(CUR_SIGN, ds);
+  const s = SIGNS[CUR_SIGN];
+  document.getElementById("day-title").textContent = `${s[2]} ${s[1]} · ${CUR_DATE === 0 ? "今日" : CUR_DATE === 1 ? "明日" : "昨日"}运势`;
+  document.getElementById("day-sub").textContent = `${ds} · ${r.element}象${r.modality}星座`;
+  const vm = [["p-love","b-love",r.dims.love],["p-wealth","b-wealth",r.dims.wealth],["p-career","b-career",r.dims.career],["p-study","b-study",r.dims.study]];
+  for (const [p, b, v] of vm) { document.getElementById(p).textContent = v + "%"; document.getElementById(b).style.width = v + "%"; }
+  document.getElementById("l-color").textContent = r.color;
+  document.getElementById("l-num").textContent = r.num;
+  document.getElementById("l-time").textContent = r.time;
+  document.getElementById("l-mate").textContent = r.mate + "座";
+  const avg = Math.round((r.dims.love + r.dims.wealth + r.dims.career + r.dims.study) / 4);
+  document.getElementById("summary").textContent =
+    `${s[1]}今天${avg >= 70 ? "整体能量偏高，属于顺风局，重要的对话和行动放在「" + r.time + "」，成功率更高" : avg >= 55 ? "整体平稳，按自己的节奏走就好，遇到犹豫的事多等半天再决定" : "整体能量偏内收，适合整理和复盘，不适合开新局"}。` +
+    `速配星座是${r.mate}座——${CUR_DATE === 1 ? "明天" : "今天"}有事多听听他们的意见。幸运数字 ${r.num} 可以用在选号、尾号这类小决定上。`;
+}
+
+buildSignGrid();
+renderTabs();
+</script>
+</body>
+</html>
