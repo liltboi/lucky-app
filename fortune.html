@@ -283,7 +283,7 @@
         <button class="mini-rep" data-r="talent">💎 隐藏天赋测试</button>
         <button class="mini-rep" data-r="persona">💼 事业型人格</button>
         <button class="mini-rep" data-r="kw2026">🌟 2026 人生关键词</button>
-        <button class="mini-rep" data-r="personality">🪷 命盘性格侧写</button>
+        <button class="mini-rep" data-r="personality">🌸 命盘性格侧写</button>
       </div>
       <button id="btn-r99" style="margin-top:10px;width:100%;padding:11px;border:none;border-radius:999px;background:rgba(255,255,255,.92);color:#8d6fd0;font-size:14px;font-weight:800;cursor:pointer">👑 完整命盘报告 · 限时免费</button>
       <p style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.8)">限时免费体验中 · 全部报告同一生辰结果恒定</p>
@@ -596,7 +596,7 @@ function starOf(chart, palace) {
   const p = chart && chart.palaces.find(x => x.name === palace);
   return p && p.majorStars.length ? p.majorStars[0].name : null;
 }
-function showMiniReport(type) {
+function themeBody(type) {
   const dg = myDayGZ();
   const myW = GAN_WUXING[dg.gan];
   const rand = seededRandom(CUR.birth + "|" + CUR.hour + "|" + type);
@@ -630,7 +630,7 @@ function showMiniReport(type) {
   } else if (type === "personality") {
     const mp = starOf(chart, "命宫");
     const fd = starOf(chart, "福德");
-    title = "🪷 你的命盘性格侧写";
+    title = "🌸 你的命盘性格侧写";
     body =
       (mp ? `<p style="margin-bottom:10px"><b>外在的你</b>（命宫坐${mp}）<br>${STAR_TEXT[mp] || ""}——这是别人眼中的你。</p>` :
       `<p style="margin-bottom:10px"><b>外在的你</b>（日主${myW}）<br>${({"木":"正直向上，有点理想主义","火":"热情外放，自带存在感","土":"沉稳包容，是大家的定心丸","金":"利落干脆，讲原则","水":"灵活机智，反应快"}[myW])}——这是别人眼中的你。</p>`) +
@@ -638,6 +638,12 @@ function showMiniReport(type) {
       `<p style="margin-bottom:10px"><b>内心的你</b><br>${pick(rand, ["外表淡定，内心戏其实很足", "看似随和，其实对在意的事非常坚持", "看起来社牛，其实需要独处回血", "嘴上佛系，心里有自己的排行榜"])}</p>`) +
       `<p style="margin-bottom:10px"><b>一句话总结</b><br>「${pick(rand, ["你是慢热型选手——但热起来就很持久", "你是反差感本人——认识越久越惊喜", "你是外柔内刚——原则的事谁也劝不动", "你是氛围引擎——你在的地方就不会冷场"])}」</p>`;
   }
+  return { title: title, body: body };
+}
+
+function showMiniReport(type) {
+  const tb = themeBody(type);
+  const title = tb.title, body = tb.body;
   $("premium-title").textContent = title + "（限时免费体验）";
   $("premium-body").innerHTML = body + `<p style="color:#a98ba6;font-size:11px">仅供娱乐，不构成任何建议。</p>`;
   const box = $("premium-box");
@@ -675,6 +681,13 @@ function showReport(type) {
       `<p style="margin-bottom:10px"><b>④ 节奏建议</b><br>${pick(rand, ["宜先聚后散，把一个渠道跑通再扩", "宜快打慢，抢占先机比完美更重要", "宜守不宜攻，这阶段少改方向多执行"])}。${STRENGTH.habit}。</p>` +
       `<p style="margin-bottom:10px"><b>⑤ 命主给的一句话</b><br>「${pick(rand, ["钱是价值的回声，先把自己活成答案", "别追风口，让风口追上正在做事的你", "慢慢来，比较快", "你的短板，雇人补；你的长板，放大到极致"])}」。</p>` +
       `<p style="margin-bottom:10px"><b>⑥ 避坑提醒</b><br>${pick(rand, ["你这盘最怕「半途而废」：宁可小步慢走，不要频繁换赛道", "你这盘最怕「贪多」：同时开太多线，最后一条都做不深", "你这盘最怕「等人」：机会不会自己来，主动开口才有戏", "你这盘最怕「完美主义」：先交付 80 分，再迭代到 100 分"])}。</p>` +
+      (() => { // ⑦+ 随机加插 2 个主题板块, 让报告更丰满
+        const pool = ["talent", "persona", "kw2026", "personality"].filter(x => x !== type);
+        const r2 = seededRandom(CUR.birth + "|" + CUR.hour + "|r19-extras");
+        const chosen = [];
+        while (chosen.length < 2 && pool.length) chosen.push(pool.splice(Math.floor(r2() * pool.length), 1)[0]);
+        return chosen.map(x => { const tb = themeBody(x); return `<div style="height:1px;background:rgba(255,255,255,.35);margin:12px 0"></div>` + tb.body; }).join("");
+      })() +
       `<p style="color:#a98ba6;font-size:11px">本报告为限时免费体验版（正式版将含逐宫深度解读）。仅供娱乐，不构成任何投资或职业建议。</p>`;
   } else {
     // ===== 真紫微排盘 (iztro, MIT) — 失败则回退规则版 =====
