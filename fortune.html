@@ -515,6 +515,7 @@ function showReport(type) {
       `<p style="margin-bottom:10px"><b>③ 财富风格</b><br>${STRENGTH.money}。适合把收入结构做成「${pick(rand, ["一主一辅", "多源小额", "一口深井", "一鱼多吃"])}」。</p>` +
       `<p style="margin-bottom:10px"><b>④ 节奏建议</b><br>${pick(rand, ["宜先聚后散，把一个渠道跑通再扩", "宜快打慢，抢占先机比完美更重要", "宜守不宜攻，这阶段少改方向多执行"])}。${STRENGTH.habit}。</p>` +
       `<p style="margin-bottom:10px"><b>⑤ 命主给的一句话</b><br>「${pick(rand, ["钱是价值的回声，先把自己活成答案", "别追风口，让风口追上正在做事的你", "慢慢来，比较快", "你的短板，雇人补；你的长板，放大到极致"])}」。</p>` +
+      `<p style="margin-bottom:10px"><b>⑥ 避坑提醒</b><br>${pick(rand, ["你这盘最怕「半途而废」：宁可小步慢走，不要频繁换赛道", "你这盘最怕「贪多」：同时开太多线，最后一条都做不深", "你这盘最怕「等人」：机会不会自己来，主动开口才有戏", "你这盘最怕「完美主义」：先交付 80 分，再迭代到 100 分"])}。</p>` +
       `<p style="color:#a98ba6;font-size:11px">本报告为限时免费体验版（正式版将含逐宫深度解读）。仅供娱乐，不构成任何投资或职业建议。</p>`;
   } else {
     // ===== 真紫微排盘 (iztro, MIT) — 失败则回退规则版 =====
@@ -532,7 +533,19 @@ function showReport(type) {
       "天相": "印星，天生的辅佐者，靠谱、讲道理，是别人最想合伙的人",
       "天梁": "荫星，老成稳重、爱照顾人，天生带长辈缘和贵人相",
       "七杀": "将星，冲劲十足、敢想敢干，人生在于选对战场",
-      "破军": "开创之星，破旧立新，不怕重来，越大的变动越藏你的机会"
+      "破军": "开创之星，破旧立新，不怕重来，越大的变动越藏你的机会",
+      "左辅": "助力之星，身边总有愿意拉你一把的人",
+      "右弼": "智囊之星，贵人多出主意型，人缘是你的资源库",
+      "文昌": "才学之星，文字、考试、专业证书是你的加分项",
+      "文曲": "才艺之星，表达细腻，适合内容创作和说服性工作",
+      "禄存": "财荫之星，守财有方，收入细水长流",
+      "天马": "驿马之星，动中求财，换环境换城市反而走运",
+      "擎羊": "刑星，冲劲与锋利并存，适合竞争性场合但防伤人伤己",
+      "陀罗": "磨星，拖得久但磨得深，适合需要耐心的赛道",
+      "火星": "急火之星，爆发力强，速战速决是你的主场",
+      "铃星": "暗火之星，后劲型选手，闷声发大财的体质",
+      "地空": "空星，想法多而飘，落地执行是关键功课",
+      "地劫": "劫星，破财多因冲动，管住手就是开运"
     };
     let chart = null;
     try {
@@ -564,16 +577,43 @@ function showReport(type) {
         const p = get(pname);
         return `<p style="margin-bottom:10px"><b>${label}</b>（${pname} · ${p.earthlyBranch}宫）<br>主星：<b>${starLine(p)}</b><br>${starText(p)}</p>`;
       };
+      const palBrief = (pname) => {
+        const p = get(pname);
+        const stars = p.majorStars.length ? p.majorStars.map(s => s.name).join("、") : "无主星";
+        const line = p.majorStars.length && STAR_TEXT[p.majorStars[0].name] ? STAR_TEXT[p.majorStars[0].name] : "受对宫影响为主，特质随环境流动";
+        return `<p style="margin-bottom:8px"><b>${pname}宫</b>（${stars}）<br><span style="color:#8a6b88">${line}。</span></p>`;
+      };
       const mp = get("命宫");
       const bodyPal = chart.palaces.find(p => p.isBodyPalace);
+      // 四化总论: 找全盘化禄权科忌落在哪宫
+      const MUT_TIP = { "禄": "你的「顺位」", "权": "你的「实力位」", "科": "你的「名声位」", "忌": "你的「修炼位」" };
+      const mutLines = [];
+      for (const p of chart.palaces) {
+        for (const s of p.majorStars) {
+          if (s.mutagen && s.mutagen !== "") mutLines.push(`化${s.mutagen}（${s.name}）落在<b>${p.name}宫</b>——这是${MUT_TIP[s.mutagen]}`);
+        }
+      }
+      const minorOf = p => { const all = [...(p.minorStars||[]), ...(p.adjacentStars||[]), ...(p.luckyStars||[]), ...(p.badStars||[])]; const named = all.filter(s => STAR_TEXT[s.name]).slice(0,2); return named.map(s => s.name + "：" + STAR_TEXT[s.name]).join("；"); };
+      const palFull = (label, pname) => {
+        const p = get(pname);
+        const minor = minorOf(p);
+        return palSec(label, pname) + (minor ? `<p style="margin:0 0 10px;color:#8a6b88;font-size:12px">辅星：${minor}</p>` : "");
+      };
       $("premium-title").textContent = "👑 已解锁 · 完整命盘报告（紫微十二宫）";
       $("premium-body").innerHTML =
-        `<p style="margin-bottom:10px"><b>命盘概览</b><br>八字 <b>${chart.chineseDate}</b> · 命宫在 <b>${mp.earthlyBranch}</b> · 身宫落 <b>${bodyPal ? bodyPal.name : "—"}</b> · 五行局 <b>${chart.fiveElementsClass}</b></p>` +
-        palSec("命宫（你的人格底盘）", "命宫") +
-        palSec("事业宫（你做事的样子）", "官禄") +
-        palSec("财帛宫（你和钱的关系）", "财帛") +
-        palSec("夫妻宫（你的感情模式）", "夫妻") +
-        palSec("福德宫（你的内心福气）", "福德") +
+        `<p style="margin-bottom:10px"><b>命盘概览</b><br>八字 <b>${chart.chineseDate}</b> · 命宫在 <b>${mp.earthlyBranch}</b> · 身宫落 <b>${bodyPal ? bodyPal.name : "—"}</b> · 五行局 <b>${chart.fiveElementsClass}</b> · 命主 <b>${chart.soul}</b> · 身主 <b>${chart.body}</b></p>` +
+        `<p style="margin-bottom:10px"><b>四化总论（你这个盘的四条主线）</b><br>${mutLines.length ? mutLines.join("<br>") : "四化分布均匀，没有特别倾斜的领域，是均衡型盘"}</p>` +
+        `<p style="margin-bottom:6px"><b>【上篇 · 六大主宫详解】</b></p>` +
+        palFull("命宫（你的人格底盘）", "命宫") +
+        palFull("事业宫（你做事的样子）", "官禄") +
+        palFull("财帛宫（你和钱的关系）", "财帛") +
+        palFull("夫妻宫（你的感情模式）", "夫妻") +
+        palFull("福德宫（你的内心福气）", "福德") +
+        palFull("迁移宫（你在外面的运气）", "迁移") +
+        `<p style="margin:6px 0"><b>【下篇 · 其余六宫速览】</b></p>` +
+        palBrief("兄弟") + palBrief("子女") + palBrief("疾厄") + palBrief("仆役") + palBrief("田宅") + palBrief("父母") +
+        `<p style="margin:6px 0"><b>【给你的三条行动清单】</b></p>` +
+        `<p style="margin-bottom:10px">① ${get("财帛").majorStars.length && ["武曲","天府","禄存"].includes(get("财帛").majorStars[0].name) ? "财帛宫坐财星：你可以放心谈钱，你的价值感就藏在定价里" : "财帛宫不坐财星：收入靠专业和服务换，定价别自贬，让作品替你说话"}<br>② ${get("官禄").majorStars.find(s=>s.mutagen==="权") ? "事业宫有权星加持：这两年是你要主动争取管理岗/主理项目的窗口" : "事业宫走实力路线：用作品集和案例说话，头衔和平台反而不是关键"}<br>③ ${mutLines.some(l=>l.includes("忌")) ? "你的化忌宫位是你最该刻意练习的领域——每天给它 30 分钟，三年后它就是壁垒" : "全盘无忌：风险偏高的是「太顺」——给自己设止损线，防松懈"}</p>` +
         `<p style="margin-bottom:10px"><b>排盘依据</b><br>本报告由紫微斗数开源引擎 iztro 按标准规则排盘（安星法可复核），解读文字为娱乐化演绎。同一生辰任何时间排盘结果一致。</p>` +
         `<p style="color:#a98ba6;font-size:11px">仅供娱乐，不构成任何医疗、投资或婚恋建议。</p>`;
     } else {
