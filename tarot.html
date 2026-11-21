@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>每日塔罗 · 今日好运研究所</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(160deg, #ffe9f1 0%, #ffd6e8 40%, #e8d5ff 100%);
+    min-height: 100vh; max-width: 480px; margin: 0 auto;
+    padding: 28px 18px 90px; color: #4a3b52; position: relative;
+    padding-bottom: 110px;
+  }
+  .disclaimer-tag { display: inline-block; font-size: 10px; color: #b58ab0; background: rgba(255,255,255,.6); border-radius: 999px; padding: 3px 10px; margin-bottom: 14px; }
+  h1 { font-size: 30px; letter-spacing: 4px; text-align: center; color: #3d2e46; font-weight: 800; text-shadow: 0 2px 0 #fff, 0 4px 14px rgba(233,142,192,.35); }
+  .subtitle { text-align: center; font-size: 12px; color: #9a7d96; margin: 8px 0 24px; }
+  .phone-card { background: rgba(255,255,255,.72); backdrop-filter: blur(12px); border-radius: 26px; padding: 22px 18px; box-shadow: 0 12px 40px rgba(220,120,180,.2); margin-bottom: 18px; }
+  .go-btn {
+    width: 100%; padding: 14px; border: none; border-radius: 999px; font-size: 16px; font-weight: 700;
+    letter-spacing: 2px; color: #fff; cursor: pointer;
+    background: linear-gradient(120deg, #ff9ec7, #c9a7ff); box-shadow: 0 8px 22px rgba(233,142,192,.5);
+  }
+  .go-btn:active { transform: scale(.97); }
+  /* 洗牌区 */
+  .deck-stage { position: relative; height: 240px; margin: 10px 0; }
+  .tcard {
+    position: absolute; left: 50%; top: 10px; width: 130px; height: 210px;
+    margin-left: -65px; border-radius: 14px; cursor: pointer;
+    background: linear-gradient(145deg, #d4548f, #8d6fd0);
+    box-shadow: 0 8px 24px rgba(141,111,208,.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .5s ease, left .5s ease, top .5s ease;
+    transform-style: preserve-3d;
+  }
+  .tcard .back {
+    width: 100%; height: 100%; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    background:
+      radial-gradient(circle at 50% 40%, rgba(255,255,255,.25) 0 8px, transparent 9px),
+      repeating-linear-gradient(45deg, rgba(255,255,255,.08) 0 6px, transparent 6px 12px),
+      linear-gradient(145deg, #d4548f, #8d6fd0);
+    font-size: 34px; color: rgba(255,255,255,.9);
+  }
+  .tcard.fanned-0 { transform: translateX(-84px) rotate(-10deg); }
+  .tcard.fanned-1 { transform: translateY(-6px); z-index: 2; }
+  .tcard.fanned-2 { transform: translateX(84px) rotate(10deg); }
+  .tcard.picked { left: 50%; top: 4px; z-index: 5; transform: rotateY(0deg); }
+  .tcard.flipped .back { display: none; }
+  .tcard .face {
+    display: none; width: 100%; height: 100%; border-radius: 14px; background: #fff;
+    flex-direction: column; align-items: center; justify-content: center; padding: 12px; text-align: center;
+    position: relative;
+  }
+  .tcard.flipped .face { display: flex; }
+  .tcard.reversed .face { transform: rotate(180deg); }
+  .face .f-num { font-size: 10px; color: #b58ab0; }
+  .face .f-name { font-size: 22px; font-weight: 800; color: #3d2e46; margin: 8px 0 4px; }
+  .face .f-pos { font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+  .pos-up { background: #ffe0ec; color: #d4548f; }
+  .pos-rev { background: #ece0ff; color: #8d6fd0; }
+  .face .f-icon { font-size: 26px; margin-top: 10px; }
+  .shuffling { animation: shake .35s infinite; }
+  @keyframes shake {
+    0% { transform: translate(-84px,-4px) rotate(-10deg); }
+    33% { transform: translate(0,-10px) rotate(2deg); }
+    66% { transform: translate(84px,-4px) rotate(10deg); }
+    100% { transform: translate(-84px,-4px) rotate(-10deg); }
+  }
+  .hint { text-align: center; font-size: 12px; color: #9a7d96; min-height: 18px; margin-bottom: 8px; }
+  .result-title { font-size: 16px; font-weight: 700; color: #3d2e46; margin-bottom: 10px; }
+  .tb-body { font-size: 13px; line-height: 1.9; color: #6b5570; }
+  .sec { margin-bottom: 12px; }
+  .sec b { color: #d4548f; }
+  .share-out { font-size: 12px; color: #7a6588; margin-top: 8px; word-break: break-all; background: #fff; border-radius: 12px; padding: 10px; }
+  .share-btn {
+    width: 100%; padding: 12px; margin-top: 14px; border: none; border-radius: 999px;
+    font-size: 14px; font-weight: 600; color: #6b5570; cursor: pointer;
+    background: rgba(255,255,255,.85); box-shadow: 0 6px 18px rgba(220,120,180,.2);
+  }
+  .footer { text-align: center; font-size: 10px; color: #b195ad; line-height: 1.8; margin-top: 20px; }
+  .hidden { display: none; }
+  /* 底部导航 */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; z-index: 60;
+    background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+    display: flex; padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(220,120,180,.2);
+  }
+  .bn-item { flex: 1; text-align: center; font-size: 10px; color: #b195ad; text-decoration: none; padding: 4px 0; }
+  .bn-item .bn-icon { font-size: 18px; display: block; margin-bottom: 1px; filter: grayscale(1) opacity(.6); }
+  .bn-item.active { color: #d4548f; font-weight: 700; }
+  .bn-item.active .bn-icon { filter: none; }
+</style>
+</head>
+<body>
+  <span class="disclaimer-tag">仅供娱乐 · 不构成任何真实预测</span>
+  <h1>每日塔罗</h1>
+  <p class="subtitle">静下心，默念你想问的事，再抽一张牌</p>
+
+  <div class="phone-card">
+    <div class="hint" id="hint">今天的三张牌已经为你洗好</div>
+    <div class="deck-stage" id="stage">
+      <div class="tcard" id="c0"><div class="back">✦</div><div class="face"><div class="f-num"></div><div class="f-name"></div><div class="f-pos"></div><div class="f-icon">🌙</div></div></div>
+      <div class="tcard" id="c1"><div class="back">✦</div><div class="face"><div class="f-num"></div><div class="f-name"></div><div class="f-pos"></div><div class="f-icon">🌙</div></div></div>
+      <div class="tcard" id="c2"><div class="back">✦</div><div class="face"><div class="f-num"></div><div class="f-name"></div><div class="f-pos"></div><div class="f-icon">🌙</div></div></div>
+    </div>
+    <button class="go-btn" id="shuffle-btn">🔄 洗牌 · 抽今日牌</button>
+  </div>
+
+  <div class="phone-card hidden" id="result-card">
+    <div class="result-title" id="r-title"></div>
+    <div class="tb-body" id="r-body"></div>
+    <button class="share-btn" id="share-btn">📲 复制结果分享给朋友</button>
+    <div class="share-out hidden" id="share-out"></div>
+  </div>
+
+  <p class="footer">牌义数据来自 <a href="https://tarovia.secondwindltd.xyz/" style="color:#b195ad">Tarovia</a> (CC BY 4.0)<br>塔罗为娱乐化演绎，同一抽取结果当日恒定 · 本页不保存任何个人信息</p>
+
+  <nav class="bottom-nav">
+    <a class="bn-item" href="index.html"><span class="bn-icon">🏠</span>首页</a>
+    <a class="bn-item" href="fortune.html"><span class="bn-icon">🌸</span>运势</a>
+    <a class="bn-item active" href="tarot.html"><span class="bn-icon">🃏</span>塔罗</a>
+    <a class="bn-item" href="stars.html"><span class="bn-icon">♓</span>星座</a>
+    <a class="bn-item" href="javascript:void(0)" onclick="soon('我的')"><span class="bn-icon">👤</span>我的</a>
+  </nav>
+  <div class="toast hidden" id="toast" style="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(61,46,70,.9);color:#fff;font-size:13px;border-radius:999px;padding:10px 20px;z-index:99">「我的」开发中 💕</div>
+
+<script src="tarot-data.js"></script>
+<script>
+function seededRandom(seedStr) {
+  let h = 1779033703 ^ seedStr.length;
+  for (let i = 0; i < seedStr.length; i++) { h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+  return function () { h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+}
+const $ = id => document.getElementById(id);
+function soon(n) { const t = $("toast"); t.classList.remove("hidden"); setTimeout(() => t.classList.add("hidden"), 2000); }
+
+let STATE = "idle"; // idle → shuffled → revealed
+let DAILY = null;
+
+function fmtDate(d) { return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+
+// 每日三张牌 (种子=日期), 洗牌只是仪式, 抽哪张→映射到当日三张之一
+function dailyDraw() {
+  const ds = fmtDate(new Date());
+  const rand = seededRandom("tarot|" + ds);
+  const idx = new Set();
+  while (idx.size < 3) idx.add(Math.floor(rand() * TAROT.length));
+  const arr = [...idx].map(i => TAROT[i]);
+  const revs = arr.map(() => rand() > 0.62); // 38% 逆位
+  return { arr, revs, ds };
+}
+
+function resetCards() {
+  for (let i = 0; i < 3; i++) {
+    const c = $("c" + i);
+    c.className = "tcard fanned-" + i;
+    c.style.display = "";
+  }
+}
+
+$("shuffle-btn").addEventListener("click", () => {
+  if (STATE === "idle" || STATE === "revealed") {
+    DAILY = dailyDraw();
+    STATE = "shuffling";
+    $("result-card").classList.add("hidden");
+    $("shuffle-btn").textContent = "🃏 洗牌中…";
+    $("hint").textContent = "想着你的问题…";
+    resetCards();
+    for (let i = 0; i < 3; i++) $("c" + i).classList.add("shuffling");
+    setTimeout(() => {
+      for (let i = 0; i < 3; i++) { const c = $("c" + i); c.classList.remove("shuffling"); c.classList.add("fanned-" + i); }
+      STATE = "shuffled";
+      $("shuffle-btn").textContent = "🔄 重新洗牌";
+      $("hint").textContent = "凭直觉点一张牌";
+    }, 1200);
+  }
+});
+
+for (let i = 0; i < 3; i++) {
+  $("c" + i).addEventListener("click", () => {
+    if (STATE !== "shuffled") return;
+    STATE = "revealed";
+    const card = DAILY.arr[i];
+    const rev = DAILY.revs[i];
+    const c = $("c" + i);
+    c.querySelector(".f-num").textContent = (card.n === 0 ? "0" : card.n) + " · " + (card.n <= 21 ? "大阿卡纳" : "小阿卡纳");
+    c.querySelector(".f-name").textContent = card.name;
+    c.querySelector(".f-pos").textContent = rev ? "逆位" : "正位";
+    c.querySelector(".f-pos").className = "f-pos " + (rev ? "pos-rev" : "pos-up");
+    c.classList.add("picked", "flipped");
+    if (rev) c.classList.add("reversed");
+    // 其余两张淡出
+    for (let j = 0; j < 3; j++) if (j !== i) $("c" + j).style.opacity = ".25";
+    const posWord = rev ? "逆位" : "正位";
+    $("r-title").textContent = "🃏 你抽到了「" + card.name + "」· " + posWord;
+    $("r-body").innerHTML =
+      `<div class="sec"><b>牌面指引</b><br>${card.intro}</div>` +
+      `<div class="sec"><b>${posWord}解读 · 关于「${card.q}」</b><br>${rev ? "逆位的能量是内向的：这张牌提示你先向内看。" : "正位的能量是顺畅的：这张牌鼓励你向外行动。"}${card.advice}</div>` +
+      `<div class="sec"><b>今日一小步</b><br>${card.next}</div>` +
+      `<div class="sec" style="color:#a98ba6;font-size:11px">${DAILY.ds} 的牌 · 当日重抽结果不变 · 仅供娱乐</div>`;
+    $("result-card").classList.remove("hidden");
+    $("result-card").scrollIntoView({ behavior: "smooth", block: "center" });
+    $("hint").textContent = "点「重新洗牌」可再抽一组（当日结果恒定）";
+  });
+}
+
+$("share-btn").addEventListener("click", () => {
+  const text = `我抽到了「${$("r-title").textContent.split("「")[1].split("」")[0]}」(${DAILY.ds})\n78张韦特塔罗 · 每日一张，凭直觉选牌，看看今日提示 ✨`;
+  try { navigator.clipboard.writeText(text); } catch (e) {}
+  const out = $("share-out");
+  out.classList.remove("hidden");
+  out.textContent = "👇 分享文案（长按复制）：\n" + text;
+});
+</script>
+</body>
+</html>
