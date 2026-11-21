@@ -178,10 +178,9 @@ $("shuffle-btn").addEventListener("click", () => {
   }
 });
 
-for (let i = 0; i < 3; i++) {
-  $("c" + i).addEventListener("click", () => {
-    if (STATE !== "shuffled") return;
+function reveal(i) {
     STATE = "revealed";
+    if (!DAILY) DAILY = dailyDraw();
     const card = DAILY.arr[i];
     const rev = DAILY.revs[i];
     const c = $("c" + i);
@@ -203,8 +202,28 @@ for (let i = 0; i < 3; i++) {
     $("result-card").classList.remove("hidden");
     $("result-card").scrollIntoView({ behavior: "smooth", block: "center" });
     $("hint").textContent = "点「重新洗牌」可再抽一组（当日结果恒定）";
+}
+for (let i = 0; i < 3; i++) {
+  $("c" + i).addEventListener("click", () => {
+    if (STATE !== "shuffled") return;
+    try { localStorage.setItem("tarot_" + DAILY.ds, JSON.stringify({ i: i })); } catch (e) {}
+    reveal(i);
   });
 }
+// 当日已抽过 → 直接恢复结果, 不用重抽
+(function restoreToday() {
+  try {
+    const ds = fmtDate(new Date());
+    const saved = JSON.parse(localStorage.getItem("tarot_" + ds) || "null");
+    if (saved && typeof saved.i === "number" && saved.i >= 0 && saved.i <= 2) {
+      DAILY = dailyDraw();
+      STATE = "shuffled";
+      $("shuffle-btn").textContent = "🔄 重新洗牌";
+      reveal(saved.i);
+      $("hint").textContent = "今天已经抽过啦，结果当日保留 ✨";
+    }
+  } catch (e) {}
+})();
 
 $("share-btn").addEventListener("click", () => {
   const text = `我抽到了「${$("r-title").textContent.split("「")[1].split("」")[0]}」(${DAILY.ds})\n78张韦特塔罗 · 每日一张，凭直觉选牌，看看今日提示 ✨`;
