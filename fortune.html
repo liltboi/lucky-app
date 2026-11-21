@@ -230,10 +230,22 @@
     <button class="share-btn" onclick="share()">📲 复制结果分享给朋友</button>
     <div class="share-out hidden" id="share-out"></div>
 
-    <div class="upsell">
+    <div class="upsell" id="upsell">
       <h3>想认识「命盘里的自己」吗？</h3>
       <p>你的生辰里藏着一套完整的<b>天生搞钱方式分析</b><br>按紫微命盘规则排盘解读 · 同一生辰结果恒定</p>
       <button id="upsell-btn">🔓 解锁完整报告 ¥1.9</button>
+    </div>
+    <div class="phone-card hidden" id="redeem-box">
+      <div class="tb-title">🎟️ 输入兑换码解锁</div>
+      <p style="font-size:12px;color:#8a6b88;line-height:1.8">付款后请联系客服获取兑换码<br>输入后立即解锁，本设备全程本地验证</p>
+      <div class="field"><input id="redeem-code" placeholder="例如 63TW-SLHR" maxlength="9" style="letter-spacing:2px;text-transform:uppercase"></div>
+      <button class="go-btn" id="redeem-btn" style="margin-top:12px">✨ 解锁报告</button>
+      <div class="err" id="redeem-msg"></div>
+    </div>
+    <div class="phone-card hidden" id="premium-box">
+      <div class="tb-title" style="color:#d4548f">💌 已解锁 · 天生搞钱方式分析</div>
+      <div class="tb-body" id="premium-body"></div>
+      <div class="rule-tag">基于紫微斗数规则排盘 · 仅供娱乐</div>
     </div>
 
     <button class="share-btn" onclick="back()">↩️ 重新输入</button>
@@ -241,6 +253,7 @@
   </div>
 </div>
 
+<script src="codes.js"></script>
 <script>
 // ================= 干支历法引擎 =================
 const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
@@ -440,11 +453,51 @@ function back() {
   window.scrollTo(0, 0);
 }
 $("go-btn").addEventListener("click", run);
-$("upsell-btn").addEventListener("click", function () {
-  const out = $("share-out");
-  out.classList.remove("hidden");
-  out.textContent = "💡 付费完整报告模块开发中，上线后此处跳转商品页";
+async function sha256Hex(s) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+$("upsell-btn").addEventListener("click", () => {
+  $("redeem-box").classList.remove("hidden");
+  $("redeem-box").scrollIntoView({ behavior: "smooth", block: "center" });
 });
+$("redeem-btn").addEventListener("click", async () => {
+  const raw = ($("redeem-code").value || "").trim().toUpperCase().replace(/-/g, "");
+  const msg = $("redeem-msg");
+  if (raw.length !== 8) { msg.textContent = "兑换码格式不对（8 位字母数字）"; return; }
+  const h = await sha256Hex(raw);
+  if (window.LUCK_CODES && window.LUCK_CODES[h]) {
+    msg.textContent = "";
+    $("redeem-box").classList.add("hidden");
+    $("upsell").classList.add("hidden");
+    unlockPremium();
+  } else {
+    msg.textContent = "兑换码无效，请核对后重试（付款后联系客服获取）";
+  }
+});
+function unlockPremium() {
+  // 付费报告: 临时版规则引擎 (正式版接 iztro 紫微排盘)
+  const [by, bm] = CUR.birth.split("-").map(Number);
+  const myW = GAN_WUXING[dayGZ(by, bm, parseInt(CUR.birth.slice(8))).gan];
+  const rand = seededRandom(CUR.birth + "|" + CUR.hour + "|premium");
+  const pick = a => a[Math.floor(rand() * a.length)];
+  const STRENGTH = {
+    "木": { strong: ["决策快、点子多", "适合先跑起来再修正"], weak: ["容易想太多不敢开始", "适合找人搭伙补执行力"] },
+    "火": { strong: ["天生感染力强，适合露脸做内容", "搞钱靠人气，先把曝光做起来"], weak: ["情绪驱动型，需要固定节奏对抗三分钟热度", "适合做有积累的事而不是追热点"] },
+    "土": { strong: ["稳、能扛事，适合长线生意", "口碑是你的复利"], weak: ["启动慢，建议抄一个验证过的模板先干"] },
+    "金": { strong: ["标准严、手感准，适合精加工型服务", "客单价可以定得比同行高"], weak: ["容易过于挑剔错失时机，给自己定 48 小时决策线"] },
+    "水": { strong: ["信息嗅觉灵，适合信息差生意", "搞钱靠流动，多平台同步出击"], weak: ["选择太多反而耗损，每天最多开两条新线"] }
+  };
+  const s = STRENGTH[myW][rand() > 0.5 ? "strong" : "weak"];
+  const moneyPath = pick(["闲鱼虚拟服务", "小红书内容引流 + 私域成交", "众测/标注类任务", "帮商家做代运营"]);
+  $("premium-body").innerHTML =
+    `<p style="margin-bottom:10px"><b>命盘基调：</b>日主属<b>${myW}</b>，${s[0]}。</p>` +
+    `<p style="margin-bottom:10px"><b>搞钱路径：</b>你的命局更适合「${moneyPath}」——${s[1]}。</p>` +
+    `<p style="margin-bottom:10px"><b>节奏建议：</b>${pick(["宜先聚后散，先把一个渠道跑通再扩", "宜快打慢，抢占先机比完美更重要", "宜守不宜攻，这阶段少改方向多执行"])}</p>` +
+    `<p style="color:#a98ba6;font-size:11px">完整版将包含：夫妻宫/财帛宫/官禄宫逐宫解读 + 年度流年提示</p>`;
+  $("premium-box").classList.remove("hidden");
+  $("premium-box").scrollIntoView({ behavior: "smooth", block: "center" });
+}
 $("birth").addEventListener("change", () => showMsg(""));
 </script>
 </body>
