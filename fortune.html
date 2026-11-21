@@ -695,13 +695,6 @@ function showReport(type) {
       `<p style="margin-bottom:10px"><b>④ 节奏建议</b><br>${pick(rand, ["宜先聚后散，把一个渠道跑通再扩", "宜快打慢，抢占先机比完美更重要", "宜守不宜攻，这阶段少改方向多执行"])}。${STRENGTH.habit}。</p>` +
       `<p style="margin-bottom:10px"><b>⑤ 命主给的一句话</b><br>「${pick(rand, ["钱是价值的回声，先把自己活成答案", "别追风口，让风口追上正在做事的你", "慢慢来，比较快", "你的短板，雇人补；你的长板，放大到极致"])}」。</p>` +
       `<p style="margin-bottom:10px"><b>⑥ 避坑提醒</b><br>${pick(rand, ["你这盘最怕「半途而废」：宁可小步慢走，不要频繁换赛道", "你这盘最怕「贪多」：同时开太多线，最后一条都做不深", "你这盘最怕「等人」：机会不会自己来，主动开口才有戏", "你这盘最怕「完美主义」：先交付 80 分，再迭代到 100 分"])}。</p>` +
-      (() => { // ⑦+ 随机加插 2 个主题板块, 让报告更丰满
-        const pool = ["talent", "kw2026"]; // 搞钱报告只加插搞钱相关板块, 与完整命盘拉开差异
-        const r2 = seededRandom(CUR.birth + "|" + CUR.hour + "|r19-extras");
-        const chosen = [];
-        while (chosen.length < 2 && pool.length) chosen.push(pool.splice(Math.floor(r2() * pool.length), 1)[0]);
-        return chosen.map(x => { const tb = themeBody(x); return `<div style="height:1px;background:rgba(255,255,255,.35);margin:12px 0"></div>` + tb.body; }).join("");
-      })() +
       `<p style="color:#a98ba6;font-size:11px">本报告为限时免费体验版（正式版将含逐宫深度解读）。仅供娱乐，不构成任何投资或职业建议。</p>`;
   } else {
     // ===== 真紫微排盘 (iztro, MIT) — 失败则回退规则版 =====
