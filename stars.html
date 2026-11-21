@@ -146,7 +146,7 @@ function renderTabs() {
   const mk = (off, label) => {
     const d = new Date(); d.setDate(d.getDate() + off);
     const b = document.createElement("button");
-    b.className = "tab" + (off === 0 ? " active" : "");
+    b.className = "tab" + (off === CUR_DATE ? " active" : "");
     b.textContent = label;
     b.addEventListener("click", () => { CUR_DATE = off; renderTabs(); });
     tabs.appendChild(b);
@@ -196,7 +196,7 @@ const ref = new Date(Date.UTC(2000, 0, 6)); // 新月锚点(0点近似, 满月�
 const phaseIdx = Math.floor((((d - ref) / 86400000) % synodic + synodic) % synodic / (synodic / 8)) % 8;
 const moonNames = ["新月","娥眉月","上弦月","盈凸月","满月","亏凸月","下弦月","残月"];
 document.getElementById("day-sub").innerHTML =
-  `<svg viewBox="0 0 512 512" width="14" height="14" style="vertical-align:-2px;color:#c9a7ff">${MOON_SVG[phaseIdx]}</svg> 今日月相「${moonNames[phaseIdx]}」 · ${ds} · ${r.element}象${r.modality}星座`;
+  `<svg viewBox="0 0 512 512" width="14" height="14" style="vertical-align:-2px;color:#c9a7ff">${MOON_SVG[phaseIdx]}</svg> ${CUR_DATE === 0 ? "今日" : CUR_DATE === 1 ? "明日" : "昨日"}月相「${moonNames[phaseIdx]}」 · ${ds} · ${r.element}象${r.modality}星座`;
   const vm = [["p-love","b-love",r.dims.love],["p-wealth","b-wealth",r.dims.wealth],["p-career","b-career",r.dims.career],["p-study","b-study",r.dims.study]];
   for (const [p, b, v] of vm) { document.getElementById(p).textContent = v + "%"; document.getElementById(b).style.width = v + "%"; }
   document.getElementById("l-color").textContent = r.color;
