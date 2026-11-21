@@ -79,6 +79,7 @@
     <div class="en">DAILY LUCK · MAKE EVERY DAY MAGICAL</div>
   </div>
   <div class="date-line" id="date-line"></div>
+  <div class="date-line hidden" id="hello-line" style="font-size:13px;color:#d4548f;font-weight:700"></div>
 
   <!-- 今日主卡 -->
   <div class="card today-card">
@@ -186,6 +187,16 @@ function soon(name) {
   timer = setTimeout(() => t.classList.remove("show"), 2200);
 }
 
+(function greeting() {
+  try {
+    const p = JSON.parse(localStorage.getItem("luck_profile") || "null");
+    if (p && p.birth) {
+      const hl = document.getElementById("hello-line");
+      hl.textContent = "💕 你的专属运势已备好，今日结果已更新";
+      hl.classList.remove("hidden");
+    }
+  } catch (e) {}
+})();
 (function renderToday() {
   const d = new Date();
   const ds = d.getFullYear() + "年" + (d.getMonth()+1) + "月" + d.getDate() + "日";
