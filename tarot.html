@@ -121,7 +121,7 @@
     <div class="r-pos"><span id="r-pos"></span></div>
     <div class="r-key" id="r-key"></div>
     <div class="sec" style="margin-top:14px">
-      <div class="sec-t">🪷 牌面指引</div>
+      <div class="sec-t">🌸 牌面指引</div>
       <div class="sec-b" id="r-intro"></div>
     </div>
     <div class="sec">
@@ -188,7 +188,7 @@ function fillResult() {
     el.innerHTML = (rev ? "<b>逆位提示：</b>" : "") + "<b>「" + data.h + "」</b><br>" + data.t;
   };
   area("r-love", c.love); area("r-study", c.study); area("r-career", c.career); area("r-wealth", c.wealth);
-  $("r-advice").innerHTML = "💌 今天的温柔建议<br>" + (rev ? "逆位的能量向内——先照顾好自己的情绪，再照顾事情。" : "正位的能量向外——把想法落到一个具体的小行动上。") + c.next;
+  $("r-advice").innerHTML = "💌 今天的温柔建议<br>" + (rev ? "逆位的能量向内——先照顾好自己的情绪，再照顾事情。" : "正位的能量向外——把想法落到一个具体的小行动上。") + c.next || "今晚睡前，把今天最想做的事写下一条。";
   $("result-card").classList.remove("hidden");
 }
 
