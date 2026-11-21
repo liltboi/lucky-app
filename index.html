@@ -3,441 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>每日运势 · 娱乐测试</title>
+<title>今日好运研究所</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(160deg, #ffe3ee 0%, #ffd6e8 35%, #e8d5ff 100%);
-    min-height: 100vh;
-    max-width: 480px;
-    margin: 0 auto;
-    padding: 28px 18px 60px;
-    color: #4a3b52;
-    position: relative;
-    overflow-x: hidden;
+    background: linear-gradient(160deg, #ffe9f1 0%, #ffd6e8 40%, #e8d5ff 100%);
+    min-height: 100vh; max-width: 480px; margin: 0 auto;
+    padding: 30px 20px 60px; color: #4a3b52; position: relative;
   }
-  /* 背景装饰 */
-  .deco {
-    position: fixed; border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,.75), rgba(255,255,255,0) 70%);
-    pointer-events: none; z-index: 0;
-  }
-  .zodiac-badge {
-    position: fixed; width: 54px; height: 54px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; color: #fff; z-index: 1;
-    background: linear-gradient(135deg, #ffb6d9, #c9a7ff);
-    box-shadow: 0 6px 18px rgba(233,142,192,.45);
-  }
-  .zb-tl { top: 40px; right: 18px; transform: rotate(-12deg); }
-  .zb-bl { bottom: 60px; left: 14px; transform: rotate(10deg); opacity: .85; }
-
-  .wrap { position: relative; z-index: 2; }
-  .disclaimer-tag {
-    display: inline-block; font-size: 10px; color: #b58ab0;
-    background: rgba(255,255,255,.6); border-radius: 999px; padding: 3px 10px;
-    margin-bottom: 14px;
-  }
-  h1 {
-    font-size: 34px; letter-spacing: 4px; text-align: center;
-    color: #3d2e46; font-weight: 800;
-    text-shadow: 0 2px 0 #fff, 0 4px 14px rgba(233,142,192,.35);
-  }
-  .subtitle { text-align: center; font-size: 12px; color: #9a7d96; margin: 8px 0 24px; }
-
-  .phone-card {
-    background: rgba(255,255,255,.72);
-    backdrop-filter: blur(12px);
-    border-radius: 26px;
-    padding: 22px 18px;
-    box-shadow: 0 12px 40px rgba(220,120,180,.22);
-    margin-bottom: 18px;
-  }
-
-  /* 输入区 */
-  .field label { display: block; font-size: 13px; color: #8a6b88; margin: 12px 0 6px; font-weight: 600; }
-  .field input, .field select {
-    width: 100%; padding: 12px 14px; border-radius: 14px; border: none;
-    background: #fff; color: #4a3b52; font-size: 15px;
-    box-shadow: inset 0 1px 4px rgba(220,120,180,.12);
-    appearance: none; outline: none;
-  }
-  .go-btn {
-    width: 100%; padding: 15px; margin-top: 22px; border: none; border-radius: 999px;
-    font-size: 17px; font-weight: 700; letter-spacing: 2px; color: #fff; cursor: pointer;
-    background: linear-gradient(120deg, #ff9ec7, #c9a7ff);
-    box-shadow: 0 8px 22px rgba(233,142,192,.5);
-  }
-  .go-btn:active { transform: scale(.97); }
-
-  /* 日期切换 */
-  .date-tabs { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
-  .tab {
-    padding: 6px 13px; border-radius: 999px; font-size: 12px;
-    background: rgba(255,255,255,.8); color: #9a7d96; cursor: pointer; border: none;
-  }
-  .tab.active { background: linear-gradient(120deg, #ff9ec7, #c9a7ff); color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(233,142,192,.4); }
-  .tab.disabled { opacity: .4; cursor: default; }
-
-  .profile-line { font-size: 11px; color: #a98ba6; text-align: center; margin-bottom: 10px; }
-  .day-title { font-size: 17px; font-weight: 700; color: #3d2e46; }
-  .day-stars { color: #ffb056; letter-spacing: 2px; font-size: 14px; margin-left: 8px; }
-
-  /* 六维进度条 */
-  .dims { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; margin-top: 14px; }
-  .dim .dim-head { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
-  .dim .dim-pct { font-weight: 700; }
-  .bar { height: 7px; border-radius: 999px; background: rgba(255,255,255,.9); overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 999px; transition: width 1s ease; }
-  .c-pink  { background: linear-gradient(90deg, #ffb3d1, #ff7eb3); }
-  .c-blue  { background: linear-gradient(90deg, #a8d8ff, #6cb6ff); }
-  .c-orange{ background: linear-gradient(90deg, #ffd591, #ffa940); }
-  .c-green { background: linear-gradient(90deg, #b7eb8f, #73d13d); }
-  .c-purple{ background: linear-gradient(90deg, #d3b5ff, #9254de); }
-  .c-teal  { background: linear-gradient(90deg, #87e8de, #13c2c2); }
-
-  /* 幸运物 2x2 */
-  .lucky-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
-  .lucky-card {
-    border-radius: 16px; padding: 12px; position: relative; overflow: hidden;
-  }
-  .lc-pink  { background: #ffe0ec; } .lc-purple{ background: #ece0ff; }
-  .lc-orange{ background: #fff0db; } .lc-green { background: #e2f7d9; }
-  .lucky-card .lc-label { font-size: 12px; color: #7a6588; margin-bottom: 4px; }
-  .lucky-card .lc-value { font-size: 14px; font-weight: 700; color: #4a3b52; }
-  .lucky-card .lc-icon { position: absolute; right: 10px; bottom: 8px; font-size: 22px; opacity: .8; }
-
-  /* 文字区 */
-  .text-block {
+  .card {
     background: rgba(255,255,255,.72); backdrop-filter: blur(12px);
-    border-radius: 22px; padding: 18px; box-shadow: 0 10px 30px rgba(220,120,180,.18);
+    border-radius: 26px; padding: 22px 20px;
+    box-shadow: 0 12px 40px rgba(220,120,180,.2);
+    margin-bottom: 16px;
   }
-  .tb-title { font-size: 15px; font-weight: 700; color: #3d2e46; margin-bottom: 8px; }
-  .tb-body { font-size: 13px; line-height: 1.9; color: #6b5570; text-align: justify; }
-  .rule-tag {
-    display: inline-block; margin-top: 10px; font-size: 10px; color: #8d6fd0;
-    background: rgba(146,84,222,.08); border: 1px solid rgba(146,84,222,.25);
-    border-radius: 999px; padding: 2px 9px;
+  .head { text-align: center; margin-bottom: 26px; }
+  .head h1 { font-size: 30px; letter-spacing: 3px; color: #3d2e46; font-weight: 800; text-shadow: 0 2px 0 #fff, 0 4px 14px rgba(233,142,192,.35); }
+  .head .en { font-size: 11px; color: #9a7d96; letter-spacing: 3px; margin-top: 8px; }
+  .badge {
+    display: inline-block; margin-top: 12px; font-size: 12px; color: #c96aa0;
+    background: linear-gradient(120deg, #ffe0ec, #ece0ff); border-radius: 999px; padding: 5px 16px; font-weight: 600;
   }
-
-  /* 分享按钮 + 转化 */
-  .share-btn {
-    width: 100%; padding: 13px; margin-top: 14px; border: none; border-radius: 999px;
-    font-size: 15px; font-weight: 600; color: #6b5570; cursor: pointer;
-    background: rgba(255,255,255,.85); box-shadow: 0 6px 18px rgba(220,120,180,.2);
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .tile {
+    border-radius: 20px; padding: 18px 16px; cursor: pointer; position: relative;
+    transition: transform .15s; min-height: 120px; display: flex; flex-direction: column; justify-content: space-between;
   }
-  .upsell {
-    background: linear-gradient(120deg, #ff9ec7, #c9a7ff);
-    border-radius: 22px; padding: 20px; margin-top: 18px; text-align: center;
-    box-shadow: 0 12px 34px rgba(233,142,192,.45);
+  .tile:active { transform: scale(.97); }
+  .t-pink { background: #ffe0ec; } .t-purple { background: #ece0ff; }
+  .t-orange { background: #fff0db; } .t-green { background: #e2f7d9; }
+  .tile .icon { font-size: 24px; }
+  .tile .name { font-size: 16px; font-weight: 700; color: #3d2e46; margin-top: 10px; }
+  .tile .desc { font-size: 11px; color: #8a6b88; margin-top: 4px; line-height: 1.6; }
+  .tile .soon {
+    position: absolute; top: 10px; right: 10px; font-size: 9px; color: #fff;
+    background: rgba(180,140,180,.55); border-radius: 999px; padding: 2px 8px;
   }
-  .upsell h3 { color: #fff; font-size: 17px; margin-bottom: 6px; }
-  .upsell p { color: rgba(255,255,255,.92); font-size: 12px; line-height: 1.7; margin-bottom: 14px; }
-  .upsell button {
-    width: auto; padding: 11px 34px; border: none; border-radius: 999px;
-    background: #fff; color: #d4548f; font-size: 15px; font-weight: 800; cursor: pointer;
+  .wide {
+    background: linear-gradient(120deg, #ff9ec7, #c9a7ff); border-radius: 20px;
+    padding: 18px 16px; margin-bottom: 16px; cursor: pointer;
+    box-shadow: 0 10px 28px rgba(233,142,192,.4);
   }
-  .footer { text-align: center; font-size: 10px; color: #b195ad; line-height: 1.8; margin-top: 26px; }
-  .hidden { display: none; }
-  .err { color: #e0709a; font-size: 12px; margin-top: 10px; min-height: 16px; }
-  .share-out { font-size: 12px; color: #7a6588; margin-top: 8px; word-break: break-all; background: #fff; border-radius: 12px; padding: 10px; }
+  .wide:active { transform: scale(.98); }
+  .wide .icon { font-size: 22px; }
+  .wide .name { color: #fff; font-size: 16px; font-weight: 800; margin-top: 8px; }
+  .wide .desc { color: rgba(255,255,255,.92); font-size: 11px; margin-top: 4px; line-height: 1.6; }
+  .toast {
+    position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%);
+    background: rgba(61,46,70,.9); color: #fff; font-size: 13px;
+    border-radius: 999px; padding: 10px 20px; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 9;
+  }
+  .toast.show { opacity: 1; }
+  .footer { text-align: center; font-size: 10px; color: #b195ad; line-height: 1.8; margin-top: 8px; }
 </style>
 </head>
 <body>
-<div class="deco" style="width:220px;height:220px;top:-60px;left:-60px;"></div>
-<div class="deco" style="width:160px;height:160px;bottom:120px;right:-50px;"></div>
-<div class="zodiac-badge zb-tl">♐</div>
-<div class="zodiac-badge zb-bl">♋</div>
-
-<div class="wrap">
-  <!-- ============ 输入页 ============ -->
-  <div id="input-view">
-    <span class="disclaimer-tag">仅供娱乐 · 不构成任何真实预测</span>
-    <h1>每日运势</h1>
-    <p class="subtitle">笑着看看运势信息，可供每日参考</p>
-    <div class="phone-card">
-      <div class="field">
-        <label>你的生日</label>
-        <input type="date" id="birth" min="1940-01-01" max="2026-12-31">
-      </div>
-      <div class="field">
-        <label>出生时辰（不知道可选「不确定」）</label>
-        <select id="hour">
-          <option value="unknown">不确定 / 忘了</option>
-          <option value="23-01">子时 23:00-01:00</option>
-          <option value="01-03">丑时 01:00-03:00</option>
-          <option value="03-05">寅时 03:00-05:00</option>
-          <option value="05-07">卯时 05:00-07:00</option>
-          <option value="07-09">辰时 07:00-09:00</option>
-          <option value="09-11">巳时 09:00-11:00</option>
-          <option value="11-13">午时 11:00-13:00</option>
-          <option value="13-15">未时 13:00-15:00</option>
-          <option value="15-17">申时 15:00-17:00</option>
-          <option value="17-19">酉时 17:00-19:00</option>
-          <option value="19-21">戌时 19:00-21:00</option>
-          <option value="21-23">亥时 21:00-23:00</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>性别</label>
-        <select id="gender">
-          <option value="x">保密</option>
-          <option value="f">女生</option>
-          <option value="m">男生</option>
-        </select>
-      </div>
-      <button class="go-btn" id="go-btn">✨ 开始测算</button>
-      <div class="err" id="msg"></div>
-    </div>
-    <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎<br>请勿将结果作为任何现实决策依据 · 本页不保存任何个人信息</p>
+  <div class="head">
+    <h1>✨ 今日好运研究所 ✨</h1>
+    <div class="en">DAILY LUCK · MAKE EVERY DAY MAGICAL</div>
+    <div class="badge">💕 笑着看看运势，每天一个好心情</div>
   </div>
 
-  <!-- ============ 结果页 ============ -->
-  <div id="result-view" class="hidden">
-    <span class="disclaimer-tag">仅供娱乐 · 不构成任何真实预测</span>
-    <h1>运势详情</h1>
-    <p class="subtitle" id="profile-line"></p>
-
-    <div class="phone-card">
-      <div class="date-tabs" id="date-tabs"></div>
-      <div class="day-title"><span id="day-label">今日运势</span><span class="day-stars" id="day-stars"></span></div>
-      <div class="dims">
-        <div class="dim"><div class="dim-head"><span>💗 爱情</span><span class="dim-pct c-pink-text" id="p-love" style="color:#ff7eb3"></span></div><div class="bar"><div class="bar-fill c-pink" id="b-love"></div></div></div>
-        <div class="dim"><div class="dim-head"><span>💰 财富</span><span class="dim-pct" id="p-wealth" style="color:#ffa940"></span></div><div class="bar"><div class="bar-fill c-orange" id="b-wealth"></div></div></div>
-        <div class="dim"><div class="dim-head"><span>💼 事业</span><span class="dim-pct" id="p-career" style="color:#6cb6ff"></span></div><div class="bar"><div class="bar-fill c-blue" id="b-career"></div></div></div>
-        <div class="dim"><div class="dim-head"><span>🍀 贵人</span><span class="dim-pct" id="p-noble" style="color:#73d13d"></span></div><div class="bar"><div class="bar-fill c-green" id="b-noble"></div></div></div>
-        <div class="dim"><div class="dim-head"><span>📖 学业</span><span class="dim-pct" id="p-study" style="color:#9254de"></span></div><div class="bar"><div class="bar-fill c-purple" id="b-study"></div></div></div>
-        <div class="dim"><div class="dim-head"><span>💬 社交</span><span class="dim-pct" id="p-social" style="color:#13c2c2"></span></div><div class="bar"><div class="bar-fill c-teal" id="b-social"></div></div></div>
-      </div>
+  <div class="grid">
+    <div class="tile t-pink" onclick="go('fortune.html')">
+      <div class="icon">🌸</div>
+      <div><div class="name">每日运势</div><div class="desc">今日财运、桃花、贵人、行动力</div></div>
     </div>
-
-    <div class="phone-card">
-      <div class="lucky-grid">
-        <div class="lucky-card lc-pink"><div class="lc-label">幸运颜色</div><div class="lc-value" id="l-color"></div><div class="lc-icon">🎨</div></div>
-        <div class="lucky-card lc-purple"><div class="lc-label">幸运数字</div><div class="lc-value" id="l-num"></div><div class="lc-icon">#️⃣</div></div>
-        <div class="lucky-card lc-orange"><div class="lc-label">幸运方位</div><div class="lc-value" id="l-dir"></div><div class="lc-icon">🧭</div></div>
-        <div class="lucky-card lc-green"><div class="lc-label">今日建星</div><div class="lc-value" id="l-jx"></div><div class="lc-icon">📅</div></div>
-      </div>
+    <div class="tile t-purple" onclick="soon('每日塔罗')">
+      <div class="icon">🃏</div>
+      <div><div class="name">每日塔罗</div><div class="desc">抽一张牌，看看今日提示</div></div>
+      <div class="soon">开发中</div>
     </div>
-
-    <div class="text-block">
-      <div class="tb-title">整体运势</div>
-      <div class="tb-body" id="summary"></div>
-      <div class="rule-tag" id="rule-line"></div>
+    <div class="tile t-orange" onclick="soon('星座运势')">
+      <div class="icon">♓</div>
+      <div><div class="name">星座运势</div><div class="desc">爱情、学业、事业、财富</div></div>
+      <div class="soon">开发中</div>
     </div>
-
-    <button class="share-btn" onclick="share()">📲 复制结果分享给朋友</button>
-    <div class="share-out hidden" id="share-out"></div>
-
-    <div class="upsell">
-      <h3>想认识「命盘里的自己」吗？</h3>
-      <p>你的生辰里藏着一套完整的<b>天生搞钱方式分析</b><br>按紫微命盘规则排盘解读 · 同一生辰结果恒定</p>
-      <button id="upsell-btn">🔓 解锁完整报告 ¥1.9</button>
+    <div class="tile t-green" onclick="soon('幸运穿搭')">
+      <div class="icon">🎀</div>
+      <div><div class="name">幸运穿搭</div><div class="desc">幸运色、穿搭、幸运物</div></div>
+      <div class="soon">开发中</div>
     </div>
-
-    <button class="share-btn" onclick="back()">↩️ 重新输入</button>
-    <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎<br>请勿将结果作为任何现实决策依据 · 本页不保存任何个人信息</p>
   </div>
-</div>
 
-<script>
-// ================= 干支历法引擎 =================
-const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
-const ZHI = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
-const GAN_WUXING = ["木","木","火","火","土","土","金","金","水","水"];
-const ZHI_WUXING = ["水","土","木","木","土","火","火","土","金","金","土","水"];
-const SHENGXIAO = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"];
+  <div class="wide" onclick="soon('专属好运报告')">
+    <div class="icon">💌</div>
+    <div class="name">专属好运报告</div>
+    <div class="desc">根据出生资料生成个性化内容，支持分享精美图片</div>
+  </div>
 
-function toJDN(y, m, d) {
-  const a = Math.floor((14 - m) / 12);
-  const y2 = y + 4800 - a, m2 = m + 12 * a - 3;
-  return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
-}
-const ANCHOR_JDN = toJDN(1949, 10, 1); // 甲子日锚点
-function dayGZ(y, m, d) {
-  const idx = ((toJDN(y, m, d) - ANCHOR_JDN) % 60 + 60) % 60;
-  return { gan: idx % 10, zhi: idx % 12, idx };
-}
-function gzName(i) { return GAN[i % 10] + ZHI[i % 12]; }
-function yearGZ(y, m) {
-  const y2 = m >= 2 ? y : y - 1;
-  const idx = ((y2 - 1984) % 60 + 60) % 60;
-  return { name: gzName(idx), zhi: idx % 12 };
-}
-function monthZhi(m, d) {
-  const terms = [[2,4,2],[3,6,3],[4,5,4],[5,6,5],[6,6,6],[7,7,7],[8,8,8],[9,8,9],[10,8,10],[11,7,11],[12,7,12]];
-  if (m === 1) return 1;
-  let mz = 1;
-  for (const [tm, td, idx] of terms) if (m > tm || (m === tm && d >= td)) mz = idx;
-  return mz;
-}
-const JIANXING = ["建","除","满","平","定","执","破","危","成","收","开","闭"];
-function jianXing(y, m, d) {
-  return JIANXING[((dayGZ(y, m, d).zhi - monthZhi(m, d)) % 12 + 12) % 12];
-}
-const JIAN_RULE = {
-  "建": { yi: ["出行","求职","开始新计划"], ji: ["动土","与人争执"], tip: "建日万物始生，宜开新局" },
-  "除": { yi: ["打扫除旧","看病调理","断舍离"], ji: ["签约","远行"], tip: "除日宜除旧布新" },
-  "满": { yi: ["聚会","置办物品","庆祝"], ji: ["就医","打官司"], tip: "满日丰盈，忌过度" },
-  "平": { yi: ["日常事务","修整","平稳推进"], ji: ["大额消费","重大决定"], tip: "平日守成，稳字当头" },
-  "定": { yi: ["签约","定计划","告白"], ji: ["搬家","远行"], tip: "定日宜定事宜" },
-  "执": { yi: ["执行既定计划","健身","专注攻坚"], ji: ["开新项目"], tip: "执日宜执守不宜开新" },
-  "破": { yi: ["破除坏习惯","清理债务"], ji: ["签约","开业","嫁娶","远行"], tip: "破日宜破不宜立" },
-  "危": { yi: ["安坐学习","复盘"], ji: ["冒险","登高","冲动消费"], tip: "危日宜静不宜动" },
-  "成": { yi: ["完成收尾","签约","庆祝成果"], ji: ["诉诸争执"], tip: "成日诸事可成" },
-  "收": { yi: ["收款","收纳","总结"], ji: ["开启新事务","置办大件"], tip: "收日宜收不宜放" },
-  "开": { yi: ["开业","面试","社交","开始学习"], ji: ["安葬","保守秘密"], tip: "开日开放，宜动不宜静" },
-  "闭": { yi: ["休息","静养","闭门复盘"], ji: ["出行","社交","开新局"], tip: "闭日宜闭不宜开" }
-};
-function wuxingRel(myGan, todayGan) {
-  const order = ["木","火","土","金","水"];
-  const diff = (order.indexOf(GAN_WUXING[todayGan]) - order.indexOf(GAN_WUXING[myGan]) + 5) % 5;
-  return [
-    { key: 0, level: 62, label: "比肩帮身" },
-    { key: 1, level: 55, label: "泄气付出" },
-    { key: 2, level: 70, label: "掌控得财" },
-    { key: 3, level: 42, label: "受制谨慎" },
-    { key: 4, level: 78, label: "得生得助" }
-  ][diff];
-}
-function seededRandom(seedStr) {
-  let h = 1779033703 ^ seedStr.length;
-  for (let i = 0; i < seedStr.length; i++) {
-    h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353);
-    h = (h << 13) | (h >>> 19);
-  }
-  return function () {
-    h = Math.imul(h ^ (h >>> 16), 2246822507);
-    h = Math.imul(h ^ (h >>> 13), 3266489909);
-    h ^= h >>> 16;
-    return (h >>> 0) / 4294967296;
-  };
-}
+  <p class="footer">所有内容仅供娱乐，不构成任何真实预测<br>请勿作为现实决策依据 · 本站不保存任何个人信息</p>
 
-// ================= UI =================
-const GENDER_TONE = { f: "姐妹", m: "兄弟", x: "朋友" };
-const $ = id => document.getElementById(id);
-function showMsg(t) { $("msg").textContent = t; }
-
-let CUR = { birth: "", hour: "", gender: "" }; // 当前用户信息(仅页面内存, 不存储)
-
-function computeFor(dateStr, birth, hour) {
-  const [ty, tm, td] = dateStr.split("-").map(Number);
-  const [by, bm, bd] = birth.split("-").map(Number);
-  const myDay = dayGZ(by, bm, bd);
-  const todayDay = dayGZ(ty, tm, td);
-  const jx = jianXing(ty, tm, td);
-  const rule = JIAN_RULE[jx];
-  const rel = wuxingRel(myDay.gan, todayDay.gan);
-  const jianScore = { "建":72,"除":65,"满":70,"平":60,"定":72,"执":65,"破":45,"危":48,"成":80,"收":62,"开":75,"闭":50 }[jx];
-  const score = Math.round(jianScore * 0.6 + rel.level * 0.4);
-  const rand = seededRandom(birth + "|" + hour + "|" + dateStr + "|dims");
-  const jxBoost = { "建":1,"除":0,"满":0,"平":-1,"定":0,"执":1,"破":-2,"危":-1,"成":1,"收":0,"开":1,"闭":-1 };
-  const d6 = (b) => Math.max(35, Math.min(96, Math.round(score + b + (rand() * 18 - 9))));
-  const dims = {
-    love:   d6(jx === "定" || jx === "满" ? 4 : -2 + jxBoost[jx]),
-    wealth: d6(rel.key === 2 ? 6 : rel.key === 3 ? -6 : jxBoost[jx] * 2),
-    career: d6(jxBoost[jx] * 3),
-    noble:  d6(rel.key === 4 ? 6 : jxBoost[jx] * 2),
-    study:  d6(jx === "危" || jx === "闭" ? 4 : -1),
-    social: d6(jx === "开" || jx === "满" ? 4 : -2 + jxBoost[jx])
-  };
-  return { dateStr, ty, tm, td, myDay, todayDay, jx, rule, rel, score, dims };
-}
-
-const HOURS = { "unknown": "时辰未提供", "23-01": "子时", "01-03": "丑时", "03-05": "寅时", "05-07": "卯时", "07-09": "辰时", "09-11": "巳时", "11-13": "午时", "13-15": "未时", "15-17": "申时", "17-19": "酉时", "19-21": "戌时", "21-23": "亥时" };
-
-function fmtDate(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
-
-function render(dateStr) {
-  const r = computeFor(dateStr, CUR.birth, CUR.hour);
-  const today = fmtDate(new Date());
-  const diffDays = Math.round((new Date(dateStr) - new Date(today)) / 86400000);
-  const label = diffDays === 0 ? "今日运势" : diffDays === 1 ? "明日运势" : diffDays === -1 ? "昨日运势" : (diffDays > 0 ? `后${diffDays}日运势` : `前${-diffDays}日运势`);
-  $("day-label").textContent = label;
-
-  const vmap = [["p-love","b-love",r.dims.love],["p-wealth","b-wealth",r.dims.wealth],["p-career","b-career",r.dims.career],["p-noble","b-noble",r.dims.noble],["p-study","b-study",r.dims.study],["p-social","b-social",r.dims.social]];
-  for (const [p, b, v] of vmap) { $(p).textContent = v + "%"; $(b).style.width = v + "%"; }
-  const avg = Math.round((r.dims.love + r.dims.wealth + r.dims.career + r.dims.noble + r.dims.study + r.dims.social) / 6);
-  $("day-stars").textContent = "★".repeat(Math.max(1, Math.min(5, Math.round(avg / 20)))) + "☆".repeat(5 - Math.max(1, Math.min(5, Math.round(avg / 20))));
-
-  // 幸运物: 按日主五行规则 + 建星
-  const wx = GAN_WUXING[r.myDay.gan];
-  const colorMap = { "木": "青色 / 绿系", "火": "红色 / 橙系", "土": "黄色 / 米系", "金": "白色 / 金系", "水": "黑色 / 蓝系" };
-  const numMap = { "木": "3、8", "火": "2、7", "土": "5、10", "金": "4、9", "水": "1、6" };
-  const dirMap = { "木": "东方", "火": "南方", "土": "中央/本地", "金": "西方", "水": "北方" };
-  $("l-color").textContent = colorMap[wx];
-  $("l-num").textContent = numMap[wx];
-  $("l-dir").textContent = dirMap[wx];
-  $("l-jx").textContent = `${r.jx}日 · ${SHENGXIAO[r.todayDay.zhi]}日`;
-
-  // 整体文案
-  const tone = GENDER_TONE[CUR.gender];
-  const relText = {
-    4: "今天你的日主得今日干支相生，属于「得生得助」的日子，贵人能量强",
-    2: "今天你日主克制今日五行，处于「掌控位」，谈钱谈合作你说了算",
-    0: "今天日主与今日五行同气，能量同频，稳扎稳打最舒服",
-    1: "今天你的日主在「泄气位」，适合输出表达，但要控制节奏别硬撑",
-    3: "今天今日五行克制你的日主，属于「受制日」，少出手、多观察"
-  }[r.rel.key];
-  $("summary").textContent =
-    `${tone}，${relText}。今日建星「${r.jx}」——${r.rule.tip}，所以${r.score >= 70 ? "整体适合主动推进，尤其是" + r.rule.yi[0] + "这类事" : r.score >= 55 ? "适合按计划走，遇到" + r.rule.ji[0] + "相关的事缓一缓" : "今天把节奏放慢，把" + r.rule.yi[0] + "做完就足够了"}。` +
-    `黄历显示今日${gzName(r.todayDay.idx)}日（${SHENGXIAO[r.todayDay.zhi]}日），冲${SHENGXIAO[(r.todayDay.zhi + 6) % 12]}，属${SHENGXIAO[(r.todayDay.zhi + 6) % 12]}的朋友今天做事多留个心眼。`;
-
-  $("rule-line").textContent = `计算依据：${gzName(r.todayDay.idx)}日 · ${yearGZ(r.ty, r.tm).name}年 · 建星「${r.jx}」 · 日主${GAN[r.myDay.gan]}${wx} vs ${GAN_WUXING[r.todayDay.gan]} → ${r.rel.label}`;
-
-  $("profile-line").textContent =
-    `${CUR.birth} · ${HOURS[CUR.hour] || CUR.hour} · ${CUR.gender === "f" ? "女" : CUR.gender === "m" ? "男" : "保密"} · ${dateStr}（仅供娱乐，本页不保存信息）`;
-
-  // 日期 tabs
-  const tabs = $("date-tabs");
-  tabs.innerHTML = "";
-  for (const off of [-2, -1, 0, 1, 2]) {
-    const d = new Date(); d.setDate(d.getDate() + off);
-    const ds = fmtDate(d);
-    const b = document.createElement("button");
-    b.className = "tab" + (ds === dateStr ? " active" : "");
-    b.textContent = off === 0 ? "今日" : off === 1 ? "明日" : off === -1 ? "昨日" : off === -2 ? "前日" : "后日";
-    b.onclick = () => { render(ds); window.__last = { date: ds, score: r.score }; };
-    tabs.appendChild(b);
-  }
-
-  window.__last = { date: dateStr, score: r.score, label };
-}
-
-function run() {
-  let birth = $("birth").value;
-  if (!birth) { birth = "1998-06-15"; showMsg("未选生日，已用示例生日 1998-06-15 演示"); }
-  CUR.birth = birth;
-  CUR.hour = $("hour").value;
-  CUR.gender = $("gender").value;
-  render(fmtDate(new Date()));
-  $("input-view").classList.add("hidden");
-  $("result-view").classList.remove("hidden");
-  window.scrollTo(0, 0);
-}
-
-function share() {
-  const r = window.__last;
-  const text = `我在「每日运势」测了 ${r.date} 的运势：综合 ${r.score} 分\n按传统黄历干支规则计算，同一生辰结果恒定，快来测你的：`;
-  try { navigator.clipboard.writeText(text); } catch (e) {}
-  const out = $("share-out");
-  out.classList.remove("hidden");
-  out.textContent = "👇 分享文案（长按复制）：\n" + text;
-}
-function back() {
-  $("result-view").classList.add("hidden");
-  $("input-view").classList.remove("hidden");
-  window.scrollTo(0, 0);
-}
-$("go-btn").addEventListener("click", run);
-$("upsell-btn").addEventListener("click", function () {
-  const out = $("share-out");
-  out.classList.remove("hidden");
-  out.textContent = "💡 付费完整报告模块开发中，上线后此处跳转商品页";
-});
-$("birth").addEventListener("change", () => showMsg(""));
-</script>
+  <div class="toast" id="toast"></div>
+  <script>
+    function go(url) { location.href = url; }
+    let timer = null;
+    function soon(name) {
+      const t = document.getElementById("toast");
+      t.textContent = "「" + name + "」模块开发中，敬请期待 💕";
+      t.classList.add("show");
+      clearTimeout(timer);
+      timer = setTimeout(() => t.classList.remove("show"), 2200);
+    }
+  </script>
 </body>
 </html>
