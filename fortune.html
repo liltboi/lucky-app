@@ -154,7 +154,7 @@
   }
   /* 底部悬浮条 */
   .sticky-cta {
-    position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto;
+    position: fixed; bottom: 64px; left: 0; right: 0; max-width: 480px; margin: 0 auto;
     background: rgba(255,255,255,.92); backdrop-filter: blur(10px);
     padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
     box-shadow: 0 -4px 20px rgba(220,120,180,.25);
@@ -165,6 +165,18 @@
   }
   .sc-a { background: linear-gradient(120deg, #ff9ec7, #c9a7ff); color: #fff; }
   .sc-b { background: #fff0f6; color: #d4548f; border: 1.5px solid #ffc2da; }
+  /* 底部导航 */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; z-index: 60;
+    background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+    display: flex; padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(220,120,180,.2);
+  }
+  .bn-item { flex: 1; text-align: center; font-size: 10px; color: #b195ad; text-decoration: none; padding: 4px 0; }
+  .bn-item .bn-icon { font-size: 18px; display: block; margin-bottom: 1px; filter: grayscale(1) opacity(.6); }
+  .bn-item.active { color: #d4548f; font-weight: 700; }
+  .bn-item.active .bn-icon { filter: none; }
+
   .err { color: #e0709a; font-size: 12px; margin-top: 10px; min-height: 16px; }
   .share-out { font-size: 12px; color: #7a6588; margin-top: 8px; word-break: break-all; background: #fff; border-radius: 12px; padding: 10px; }
 </style>
@@ -682,9 +694,18 @@ function showReport(type) {
 
 $("birth").addEventListener("change", () => showMsg(""));
 </script>
+<script>function soonNav(){const t=document.getElementById('toast');t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2000);}</script>
   <div class="sticky-cta hidden" id="sticky-cta">
     <button class="sc-a" onclick="showReport('r99')">👑 完整命盘 · 免费</button>
     <button class="sc-b" onclick="showReport('r19')">🧧 搞钱分析 · 免费</button>
   </div>
+  <nav class="bottom-nav">
+    <a class="bn-item" href="index.html"><span class="bn-icon">🏠</span>首页</a>
+    <a class="bn-item " href="fortune.html"><span class="bn-icon">🌸</span>运势</a>
+    <a class="bn-item" href="tarot.html"><span class="bn-icon">🃏</span>塔罗</a>
+    <a class="bn-item" href="stars.html"><span class="bn-icon">♓</span>星座</a>
+    <a class="bn-item" href="javascript:void(0)" onclick="soonNav()"><span class="bn-icon">👤</span>我的</a>
+  </nav>
+  <div class="toast hidden" id="toast" style="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(61,46,70,.9);color:#fff;font-size:13px;border-radius:999px;padding:10px 20px;z-index:99">「我的」开发中 💕</div>
 </body>
 </html>
