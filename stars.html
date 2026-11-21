@@ -222,6 +222,19 @@ document.getElementById("day-sub").innerHTML =
 }
 
 buildSignGrid();
+// 从本地资料自动识别太阳星座
+(function autoSign() {
+  try {
+    const p = JSON.parse(localStorage.getItem("luck_profile") || "null");
+    if (p && p.birth) {
+      const [y, m, d] = p.birth.split("-").map(Number);
+      for (let i = 0; i < SIGNS.length; i++) {
+        const [, m1, d1, m2, d2] = SIGNS[i];
+        if ((m === m1 && d >= d1) || (m === m2 && d <= d2)) { CUR_SIGN = i; break; }
+      }
+    }
+  } catch (e) {}
+})();
 renderTabs();
 </script>
   <nav class="bottom-nav">
