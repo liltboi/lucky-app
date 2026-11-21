@@ -257,6 +257,7 @@
 </div>
 
 <script src="codes.js"></script>
+<script src="lib/iztro.min.js"></script>
 <script>
 // ================= 干支历法引擎 =================
 const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
@@ -516,29 +517,91 @@ function showReport(type) {
       `<p style="margin-bottom:10px"><b>⑤ 命主给的一句话</b><br>「${pick(rand, ["钱是价值的回声，先把自己活成答案", "别追风口，让风口追上正在做事的你", "慢慢来，比较快", "你的短板，雇人补；你的长板，放大到极致"])}」。</p>` +
       `<p style="color:#a98ba6;font-size:11px">本报告为限时免费体验版（正式版将含逐宫深度解读）。仅供娱乐，不构成任何投资或职业建议。</p>`;
   } else {
-    const PALACE = {
-      事业: { good: ["思路清晰，适合做需要规划感的位置", "手上有活，靠专业立身", "天生带说服力，适合面向人的岗位", "执行力强，是团队里把事落地的那个人"],
-              tip: ["这阶段最忌频繁换赛道，深挖一个方向", "主动争取一次展示机会，贵人会看见你", "把手头一件事做到 120 分，比开三件新事强"] },
-      财帛: { good: ["对数字敏感，理财意识天生在线", "财来财去但总能留下本金", "擅长把爱好变现", "节约型体质，聚沙成塔"],
-              tip: ["大额消费前冷静 24 小时", "设一个自动储蓄，先存后花", "避免借贷给熟人，损财又损情"] },
-      感情: { good: ["桃花质量高于数量，容易遇到同频的人", "真诚是最大杀器，套路在你身上失效", "感情里偏被动，但一旦认定就很稳", "魅力在细节里，熟人才看得见"],
-              tip: ["主动一点，缘分不会自己敲门", "别在情绪上头时下判断", "把期待说出来，别让人猜"] },
-      学业: { good: ["理解力强，擅长举一反三", "专注型选手，适合深啃难题", "记忆力好，临场发挥稳", "跨界学习能力强，杂学旁收"],
-              tip: ["输出倒逼输入，学完讲给别人听", "番茄钟比熬大夜适合你", "错题本是你最快的提分路径"] },
-      健康: { good: ["底子不错，恢复力强", "体质偏敏感，对环境变化反应快", "精力曲线偏夜型", "情绪影响身体明显，养心即养生"],
-              tip: ["23 点前放下手机，是你的头号养生", "每周三次出汗运动，气色立竿见影", "少喝冰的，你的脾胃在悄悄记账"] }
+    // ===== 真紫微排盘 (iztro, MIT) — 失败则回退规则版 =====
+    const STAR_TEXT = {
+      "紫微": "帝座之星，天生的主事气质，不吃亏但也不将就，格局越大越贵气",
+      "天机": "谋士之星，脑子转得快、擅长分析和谋划，是最会做决定的一类人",
+      "太阳": "博爱之星，付出型人格，走到哪都自带光和热，也最容易操心",
+      "武曲": "正财之星，果断、行动派，对钱敏感，是天生的执行者",
+      "天同": "福星，随和好相处，享受当下，福气往往藏在「不争」里",
+      "廉贞": "次桃花+原则之星，外冷内热，做事有底线，魅力带距离感",
+      "天府": "库星，稳、会安排、守得住，天生适合管钱管事",
+      "太阴": "温柔细腻之星，感受力强，擅长照顾人和打理生活",
+      "贪狼": "桃花+才艺之星，欲望强、兴趣广、多才多艺，人生剧本很热闹",
+      "巨门": "口才之星，能说会道也容易招是非，把嘴用在专业上就是生产力",
+      "天相": "印星，天生的辅佐者，靠谱、讲道理，是别人最想合伙的人",
+      "天梁": "荫星，老成稳重、爱照顾人，天生带长辈缘和贵人相",
+      "七杀": "将星，冲劲十足、敢想敢干，人生在于选对战场",
+      "破军": "开创之星，破旧立新，不怕重来，越大的变动越藏你的机会"
     };
-    const sec = (name) => {
-      const p = PALACE[name];
-      return `<p style="margin-bottom:10px"><b>${name}宫</b>（${pick(rand, ["旺", "稳", "升", "守"])}）<br>${pick(rand, p.good)}。${pick(rand, p.tip)}。</p>`;
-    };
-    const yearG = yearGZ(by, bm);
-    $("premium-title").textContent = "👑 已解锁 · 完整命盘报告（限时免费体验）";
-    $("premium-body").innerHTML =
-      `<p style="margin-bottom:10px"><b>命盘概览</b><br>日柱 <b>${gzName(dg.idx)}</b> · 日主<b>${GAN[dg.gan]}${myW}</b> · 生年 <b>${yearG.name}</b>（${SHENGXIAO[yearG.zhi]}年）${CUR.hour === "unknown" ? "" : " · " + HOURS[CUR.hour]}。五行格局：<b>${myW}</b>为主${myW === GAN_WUXING[yearG.idx % 10] ? "，与生年同气，格局偏纯" : "，与生年相异，格局富变化"}。</p>` +
-      sec("事业") + sec("财帛") + sec("感情") + sec("学业") + sec("健康") +
-      `<p style="margin-bottom:10px"><b>年度流年提示</b><br>${pick(rand, ["今年宜「守正出新」：主线不动，副线试新", "今年宜「广结善缘」：贵人藏在人堆里", "今年宜「深耕内功」：外部机会平淡，正好修炼", "今年宜「小步快跑」：试错成本低，大胆试"])}</p>` +
-      `<p style="color:#a98ba6;font-size:11px">本报告为限时免费体验版（正式版将含十二宫完整排盘与流年逐月提示）。基于传统命理规则的娱乐化演绎，仅供娱乐，不构成任何医疗、投资或婚恋建议。</p>`;
+    let chart = null;
+    try {
+      if (typeof iztro !== "undefined") {
+        const TI = { "23-01": 0, "01-03": 1, "03-05": 2, "05-07": 3, "07-09": 4, "09-11": 5, "11-13": 6, "13-15": 7, "15-17": 8, "17-19": 9, "19-21": 10, "21-23": 11 };
+        const ti = CUR.hour === "unknown" ? 0 : TI[CUR.hour];
+        chart = iztro.astro.astrolabeBySolarDate(by + "-" + bm + "-" + bd, ti, CUR.gender === "m" ? "male" : "female");
+      }
+    } catch (e) { chart = null; }
+    if (chart) {
+      const get = name => chart.palaces.find(p => p.name === name);
+      const starLine = p => {
+        if (!p || !p.majorStars.length) return "宫内无主星，特质由对宫补足，格局看整体搭配";
+        const names = p.majorStars.map(s => s.name + (s.mutagen && s.mutagen !== "" ? "（化" + s.mutagen + "）" : "")).join("、");
+        return names;
+      };
+      const starText = p => {
+        if (!p || !p.majorStars.length) return "这一宫偏「空白」，意味着它受环境和选择的影响更大——你有更多自主塑造的空间。";
+        const s0 = p.majorStars[0];
+        const base = STAR_TEXT[s0.name] || "主星特质内敛，看整体搭配";
+        const mut = p.majorStars.find(s => s.mutagen && s.mutagen !== "");
+        const mutText = mut ? (mut.mutagen === "禄" ? "化禄在这宫，是这个盘的「顺位」所在，最容易在这里得甜头" :
+          mut.mutagen === "权" ? "化权在这宫，掌控欲和实力都在这里加成，适合主动出击" :
+          mut.mutagen === "科" ? "化科在这宫，名声和口碑会从这里来" :
+          "化忌在这宫，这是你人生最需要「刻意练习」的课题——避不开，但练成了就是护城河") : "";
+        return base + "。" + (mutText ? mutText + "。" : "");
+      };
+      const palSec = (label, pname) => {
+        const p = get(pname);
+        return `<p style="margin-bottom:10px"><b>${label}</b>（${pname} · ${p.earthlyBranch}宫）<br>主星：<b>${starLine(p)}</b><br>${starText(p)}</p>`;
+      };
+      const mp = get("命宫");
+      const bodyPal = chart.palaces.find(p => p.isBodyPalace);
+      $("premium-title").textContent = "👑 已解锁 · 完整命盘报告（紫微十二宫）";
+      $("premium-body").innerHTML =
+        `<p style="margin-bottom:10px"><b>命盘概览</b><br>八字 <b>${chart.chineseDate}</b> · 命宫在 <b>${mp.earthlyBranch}</b> · 身宫落 <b>${bodyPal ? bodyPal.name : "—"}</b> · 五行局 <b>${chart.fiveElementsClass}</b></p>` +
+        palSec("命宫（你的人格底盘）", "命宫") +
+        palSec("事业宫（你做事的样子）", "官禄") +
+        palSec("财帛宫（你和钱的关系）", "财帛") +
+        palSec("夫妻宫（你的感情模式）", "夫妻") +
+        palSec("福德宫（你的内心福气）", "福德") +
+        `<p style="margin-bottom:10px"><b>排盘依据</b><br>本报告由紫微斗数开源引擎 iztro 按标准规则排盘（安星法可复核），解读文字为娱乐化演绎。同一生辰任何时间排盘结果一致。</p>` +
+        `<p style="color:#a98ba6;font-size:11px">仅供娱乐，不构成任何医疗、投资或婚恋建议。</p>`;
+    } else {
+      // —— 回退: 规则版五宫 ——
+      const PALACE = {
+        事业: { good: ["思路清晰，适合做需要规划感的位置", "手上有活，靠专业立身", "天生带说服力，适合面向人的岗位", "执行力强，是团队里把事落地的那个人"],
+                tip: ["这阶段最忌频繁换赛道，深挖一个方向", "主动争取一次展示机会，贵人会看见你", "把手头一件事做到 120 分，比开三件新事强"] },
+        财帛: { good: ["对数字敏感，理财意识天生在线", "财来财去但总能留下本金", "擅长把爱好变现", "节约型体质，聚沙成塔"],
+                tip: ["大额消费前冷静 24 小时", "设一个自动储蓄，先存后花", "避免借贷给熟人，损财又损情"] },
+        感情: { good: ["桃花质量高于数量，容易遇到同频的人", "真诚是最大杀器，套路在你身上失效", "感情里偏被动，但一旦认定就很稳", "魅力在细节里，熟人才看得见"],
+                tip: ["主动一点，缘分不会自己敲门", "别在情绪上头时下判断", "把期待说出来，别让人猜"] },
+        学业: { good: ["理解力强，擅长举一反三", "专注型选手，适合深啃难题", "记忆力好，临场发挥稳", "跨界学习能力强，杂学旁收"],
+                tip: ["输出倒逼输入，学完讲给别人听", "番茄钟比熬大夜适合你", "错题本是你最快的提分路径"] },
+        健康: { good: ["底子不错，恢复力强", "体质偏敏感，对环境变化反应快", "精力曲线偏夜型", "情绪影响身体明显，养心即养生"],
+                tip: ["23 点前放下手机，是你的头号养生", "每周三次出汗运动，气色立竿见影", "少喝冰的，你的脾胃在悄悄记账"] }
+      };
+      const sec = (name) => {
+        const p = PALACE[name];
+        return `<p style="margin-bottom:10px"><b>${name}宫</b>（${pick(rand, ["旺", "稳", "升", "守"])}）<br>${pick(rand, p.good)}。${pick(rand, p.tip)}。</p>`;
+      };
+      const yearG = yearGZ(by, bm);
+      $("premium-title").textContent = "👑 已解锁 · 完整命盘报告（限时免费体验）";
+      $("premium-body").innerHTML =
+        `<p style="margin-bottom:10px"><b>命盘概览</b><br>日柱 <b>${gzName(dg.idx)}</b> · 日主<b>${GAN[dg.gan]}${myW}</b> · 生年 <b>${yearG.name}</b>（${SHENGXIAO[yearG.zhi]}年）${CUR.hour === "unknown" ? "" : " · " + HOURS[CUR.hour]}。五行格局：<b>${myW}</b>为主${myW === GAN_WUXING[yearG.idx % 10] ? "，与生年同气，格局偏纯" : "，与生年相异，格局富变化"}。</p>` +
+        sec("事业") + sec("财帛") + sec("感情") + sec("学业") + sec("健康") +
+        `<p style="margin-bottom:10px"><b>年度流年提示</b><br>${pick(rand, ["今年宜「守正出新」：主线不动，副线试新", "今年宜「广结善缘」：贵人藏在人堆里", "今年宜「深耕内功」：外部机会平淡，正好修炼", "今年宜「小步快跑」：试错成本低，大胆试"])}</p>` +
+        `<p style="color:#a98ba6;font-size:11px">本报告为限时免费体验版（正式版将含十二宫完整排盘与流年逐月提示）。基于传统命理规则的娱乐化演绎，仅供娱乐，不构成任何医疗、投资或婚恋建议。</p>`;
+    }
   }
   box.classList.remove("hidden");
   box.scrollIntoView({ behavior: "smooth", block: "center" });
