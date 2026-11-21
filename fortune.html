@@ -163,8 +163,6 @@
   .sticky-cta button {
     flex: 1; padding: 11px; border: none; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer;
   }
-  .mini-rep { padding: 11px 8px; border: none; border-radius: 14px; background: rgba(255,255,255,.92); color: #d4548f; font-size: 13px; font-weight: 700; cursor: pointer; }
-  .mini-rep:active { transform: scale(.96); }
   .sc-a { background: linear-gradient(120deg, #ff9ec7, #c9a7ff); color: #fff; }
   .sc-b { background: #fff0f6; color: #d4548f; border: 1.5px solid #ffc2da; }
   /* 底部导航 */
@@ -278,13 +276,7 @@
     <div class="upsell" id="upsell">
       <h3>想认识「命盘里的自己」吗？</h3>
       <p>你的生辰里藏着一套完整的<b>命盘分析</b><br>按传统命理规则排盘解读 · 同一生辰结果恒定</p>
-      <button id="btn-r19">🎁 今日主打报告加载中…</button>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-        <button class="mini-rep" data-r="talent">💎 隐藏天赋测试</button>
-        <button class="mini-rep" data-r="persona">💼 事业型人格</button>
-        <button class="mini-rep" data-r="kw2026">🌟 2026 人生关键词</button>
-        <button class="mini-rep" data-r="personality">🌸 命盘性格侧写</button>
-      </div>
+      <button id="btn-r19">🧧 天生搞钱方式分析 · 限时免费</button>
       <button id="btn-r99" style="margin-top:10px;width:100%;padding:11px;border:none;border-radius:999px;background:rgba(255,255,255,.92);color:#8d6fd0;font-size:14px;font-weight:800;cursor:pointer">👑 完整命盘报告 · 限时免费</button>
       <p style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.8)">限时免费体验中 · 全部报告同一生辰结果恒定</p>
       <div style="text-align:center;margin-top:8px"><span id="redeem-link" style="font-size:11px;color:#fff;text-decoration:underline;cursor:pointer">已有兑换码？</span></div>
@@ -535,22 +527,7 @@ async function sha256Hex(s) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
-document.querySelectorAll(".mini-rep").forEach(b => b.addEventListener("click", () => showReport(b.dataset.r)));
-const DAILY_THEMES = [
-  { t: "r19", name: "测测你天生适合哪种搞钱方式", emoji: "🧧" },
-  { t: "talent", name: "你的隐藏天赋到底是什么？", emoji: "💎" },
-  { t: "persona", name: "你属于哪种事业型人格？", emoji: "💼" },
-  { t: "kw2026", name: "你的2026年人生关键词", emoji: "🌟" },
-  { t: "personality", name: "你的命盘里藏着什么性格特点？", emoji: "🌸" }
-];
-function todayTheme() {
-  const ds = new Date();
-  const key = ds.getFullYear() + "-" + (ds.getMonth() + 1) + "-" + ds.getDate();
-  return DAILY_THEMES[Math.floor(seededRandom("daily-theme|" + key)() * DAILY_THEMES.length)];
-}
-const TODAY_THEME = todayTheme();
-$("btn-r19").textContent = "🎁 今日主打 · " + TODAY_THEME.emoji + "《" + TODAY_THEME.name + "》";
-$("btn-r19").addEventListener("click", () => TODAY_THEME.t === "r19" ? showReport("r19") : showMiniReport(TODAY_THEME.t));
+$("btn-r19").addEventListener("click", () => showReport("r19"));
 $("btn-r99").addEventListener("click", () => showReport("r99"));
 $("redeem-link").addEventListener("click", () => {
   $("redeem-box").classList.remove("hidden");
@@ -780,7 +757,6 @@ function showReport(type) {
       };
       $("premium-title").textContent = "👑 已解锁 · 完整命盘报告（紫微十二宫）";
       $("premium-body").innerHTML =
-        `<p style="margin-bottom:8px"><span style="display:inline-block;background:#ece0ff;color:#8d6fd0;font-size:11px;font-weight:700;border-radius:999px;padding:2px 12px">本篇主题：紫微十二宫 · 完整命盘</span></p>` +
         `<p style="margin-bottom:10px"><b>命盘概览</b><br>八字 <b>${chart.chineseDate}</b> · 命宫在 <b>${mp.earthlyBranch}</b> · 身宫落 <b>${bodyPal ? bodyPal.name : "—"}</b> · 五行局 <b>${chart.fiveElementsClass}</b> · 命主 <b>${chart.soul}</b> · 身主 <b>${chart.body}</b></p>` +
         `<p style="margin-bottom:10px"><b>四化总论（你这个盘的四条主线）</b><br>${mutLines.length ? mutLines.join("<br>") : "四化分布均匀，没有特别倾斜的领域，是均衡型盘"}</p>` +
         `<p style="margin-bottom:6px"><b>【上篇 · 六大主宫详解】</b></p>` +
@@ -815,10 +791,8 @@ function showReport(type) {
         return `<p style="margin-bottom:10px"><b>${name}宫</b>（${pick(rand, ["旺", "稳", "升", "守"])}）<br>${pick(rand, p.good)}。${pick(rand, p.tip)}。</p>`;
       };
       const yearG = yearGZ(by, bm);
-      $("premium-title").textContent = "👑 已解锁 · 完整命盘报告 · 简版（排盘引擎未加载）";
+      $("premium-title").textContent = "👑 已解锁 · 完整命盘报告（限时免费体验）";
       $("premium-body").innerHTML =
-        `<p style="margin-bottom:8px"><span style="display:inline-block;background:#ece0ff;color:#8d6fd0;font-size:11px;font-weight:700;border-radius:999px;padding:2px 12px">本篇主题：命盘全览 · 事业/财帛/感情/学业/健康五宫</span></p>` +
-        `<p style="color:#a98ba6;font-size:11px;margin-bottom:10px">⏳ 排盘引擎本次未加载成功，当前为干支规则简版；刷新页面重试可加载完整紫微十二宫版。</p>` +
         `<p style="margin-bottom:10px"><b>命盘概览</b><br>日柱 <b>${gzName(dg.idx)}</b> · 日主<b>${GAN[dg.gan]}${myW}</b> · 生年 <b>${yearG.name}</b>（${SHENGXIAO[yearG.zhi]}年）${CUR.hour === "unknown" ? "" : " · " + HOURS[CUR.hour]}。五行格局：<b>${myW}</b>为主${myW === GAN_WUXING[yearG.idx % 10] ? "，与生年同气，格局偏纯" : "，与生年相异，格局富变化"}。</p>` +
         sec("事业") + sec("财帛") + sec("感情") + sec("学业") + sec("健康") +
         `<p style="margin-bottom:10px"><b>年度流年提示</b><br>${pick(rand, ["今年宜「守正出新」：主线不动，副线试新", "今年宜「广结善缘」：贵人藏在人堆里", "今年宜「深耕内功」：外部机会平淡，正好修炼", "今年宜「小步快跑」：试错成本低，大胆试"])}</p>` +
