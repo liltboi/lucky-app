@@ -224,10 +224,11 @@
           <option value="m">男生</option>
         </select>
       </div>
-      <button class="go-btn" id="go-btn">✨ 开始测算</button>
+      <button class="go-btn" id="go-btn">✨ 生成我的专属运势</button>
+      <p style="font-size:11px;color:#a98ba6;line-height:1.8;margin-top:12px">🔒 出生资料仅保存在<b>你自己的浏览器</b>里，用于生成个性化内容，不上传、不公开、可随时清除<br>时辰不确定时将使用简化算法，不会擅自补造时柱</p>
       <div class="err" id="msg"></div>
     </div>
-    <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎<br>请勿将结果作为任何现实决策依据 · 本页不保存任何个人信息</p>
+    <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎<br>请勿将结果作为任何现实决策依据 · 出生资料仅保存在你的浏览器本地</p>
   </div>
 
   <!-- ============ 结果页 ============ -->
@@ -293,8 +294,8 @@
       <div class="rule-tag">基于传统命理规则排盘 · 仅供娱乐</div>
     </div>
 
-    <button class="share-btn" onclick="back()">↩️ 重新输入</button>
-    <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎<br>请勿将结果作为任何现实决策依据 · 本页不保存任何个人信息</p>
+    <button class="share-btn" onclick="back()">✏️ 修改出生资料</button>
+    <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎<br>请勿将结果作为任何现实决策依据 · 出生资料仅保存在你的浏览器本地</p>
   </div>
 </div>
 
@@ -479,6 +480,7 @@ function run() {
   CUR.birth = birth;
   CUR.hour = $("hour").value;
   CUR.gender = $("gender").value;
+  saveProfile();
   render(fmtDate(new Date()));
   $("input-view").classList.add("hidden");
   $("result-view").classList.remove("hidden");
@@ -500,7 +502,27 @@ function back() {
   $("sticky-cta").classList.add("hidden");
   window.scrollTo(0, 0);
 }
+// ================= 本地资料记忆 =================
+function loadProfile() {
+  try {
+    const p = JSON.parse(localStorage.getItem("luck_profile") || "null");
+    if (p && p.birth) {
+      $("birth").value = p.birth;
+      $("hour").value = p.hour || "unknown";
+      $("gender").value = p.gender || "x";
+      return true;
+    }
+  } catch (e) {}
+  return false;
+}
+function saveProfile() {
+  try { localStorage.setItem("luck_profile", JSON.stringify({ birth: $("birth").value, hour: $("hour").value, gender: $("gender").value })); } catch (e) {}
+}
+function clearProfile() { try { localStorage.removeItem("luck_profile"); } catch (e) {} }
+const HAS_PROFILE = loadProfile();
+
 $("go-btn").addEventListener("click", run);
+function autoRun() { if (HAS_PROFILE && $("birth").value) run(); }
 async function sha256Hex(s) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
@@ -693,6 +715,7 @@ function showReport(type) {
 }
 
 $("birth").addEventListener("change", () => showMsg(""));
+if (HAS_PROFILE) { setTimeout(autoRun, 0); } else { setTimeout(() => { showMsg("首次使用？填好出生资料，以后就不用再填啦"); }, 300); }
 </script>
 <script>function soonNav(){const t=document.getElementById('toast');t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2000);}</script>
   <div class="sticky-cta hidden" id="sticky-cta">
