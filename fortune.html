@@ -278,7 +278,7 @@
     <div class="upsell" id="upsell">
       <h3>想认识「命盘里的自己」吗？</h3>
       <p>你的生辰里藏着一套完整的<b>命盘分析</b><br>按传统命理规则排盘解读 · 同一生辰结果恒定</p>
-      <button id="btn-r19">🧧 天生搞钱方式分析 · 限时免费</button>
+      <button id="btn-r19">🎁 今日主打报告加载中…</button>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
         <button class="mini-rep" data-r="talent">💎 隐藏天赋测试</button>
         <button class="mini-rep" data-r="persona">💼 事业型人格</button>
@@ -536,7 +536,21 @@ async function sha256Hex(s) {
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
 document.querySelectorAll(".mini-rep").forEach(b => b.addEventListener("click", () => showReport(b.dataset.r)));
-$("btn-r19").addEventListener("click", () => showReport("r19"));
+const DAILY_THEMES = [
+  { t: "r19", name: "测测你天生适合哪种搞钱方式", emoji: "🧧" },
+  { t: "talent", name: "你的隐藏天赋到底是什么？", emoji: "💎" },
+  { t: "persona", name: "你属于哪种事业型人格？", emoji: "💼" },
+  { t: "kw2026", name: "你的2026年人生关键词", emoji: "🌟" },
+  { t: "personality", name: "你的命盘里藏着什么性格特点？", emoji: "🌸" }
+];
+function todayTheme() {
+  const ds = new Date();
+  const key = ds.getFullYear() + "-" + (ds.getMonth() + 1) + "-" + ds.getDate();
+  return DAILY_THEMES[Math.floor(seededRandom("daily-theme|" + key)() * DAILY_THEMES.length)];
+}
+const TODAY_THEME = todayTheme();
+$("btn-r19").textContent = "🎁 今日主打 · " + TODAY_THEME.emoji + "《" + TODAY_THEME.name + "》";
+$("btn-r19").addEventListener("click", () => TODAY_THEME.t === "r19" ? showReport("r19") : showMiniReport(TODAY_THEME.t));
 $("btn-r99").addEventListener("click", () => showReport("r99"));
 $("redeem-link").addEventListener("click", () => {
   $("redeem-box").classList.remove("hidden");
