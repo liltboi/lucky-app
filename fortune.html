@@ -232,8 +232,11 @@
 
     <div class="upsell" id="upsell">
       <h3>想认识「命盘里的自己」吗？</h3>
-      <p>你的生辰里藏着一套完整的<b>天生搞钱方式分析</b><br>按紫微命盘规则排盘解读 · 同一生辰结果恒定</p>
-      <button id="upsell-btn">🔓 解锁完整报告 ¥1.9</button>
+      <p>你的生辰里藏着一套完整的<b>命盘分析</b><br>按传统命理规则排盘解读 · 同一生辰结果恒定</p>
+      <button id="btn-r19">🧧 天生搞钱方式分析 · 限时免费</button>
+      <button id="btn-r99" style="margin-top:10px;background:rgba(255,255,255,.92);color:#8d6fd0">👑 完整命盘报告 · 限时免费</button>
+      <p style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.8)">限时免费体验中，正式版将含逐宫深度解读</p>
+      <div style="text-align:center;margin-top:8px"><span id="redeem-link" style="font-size:11px;color:#fff;text-decoration:underline;cursor:pointer">已有兑换码？</span></div>
     </div>
     <div class="phone-card hidden" id="redeem-box">
       <div class="tb-title">🎟️ 输入兑换码解锁</div>
@@ -243,9 +246,9 @@
       <div class="err" id="redeem-msg"></div>
     </div>
     <div class="phone-card hidden" id="premium-box">
-      <div class="tb-title" style="color:#d4548f">💌 已解锁 · 天生搞钱方式分析</div>
+      <div class="tb-title" style="color:#d4548f" id="premium-title">💌</div>
       <div class="tb-body" id="premium-body"></div>
-      <div class="rule-tag">基于紫微斗数规则排盘 · 仅供娱乐</div>
+      <div class="rule-tag">基于传统命理规则排盘 · 仅供娱乐</div>
     </div>
 
     <button class="share-btn" onclick="back()">↩️ 重新输入</button>
@@ -457,7 +460,9 @@ async function sha256Hex(s) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
-$("upsell-btn").addEventListener("click", () => {
+$("btn-r19").addEventListener("click", () => showReport("r19"));
+$("btn-r99").addEventListener("click", () => showReport("r99"));
+$("redeem-link").addEventListener("click", () => {
   $("redeem-box").classList.remove("hidden");
   $("redeem-box").scrollIntoView({ behavior: "smooth", block: "center" });
 });
@@ -469,35 +474,76 @@ $("redeem-btn").addEventListener("click", async () => {
   if (window.LUCK_CODES && window.LUCK_CODES[h]) {
     msg.textContent = "";
     $("redeem-box").classList.add("hidden");
-    $("upsell").classList.add("hidden");
-    unlockPremium();
+    showReport("r99");
   } else {
     msg.textContent = "兑换码无效，请核对后重试（付款后联系客服获取）";
   }
 });
-function unlockPremium() {
-  // 付费报告: 临时版规则引擎 (正式版接 iztro 紫微排盘)
-  const [by, bm] = CUR.birth.split("-").map(Number);
-  const myW = GAN_WUXING[dayGZ(by, bm, parseInt(CUR.birth.slice(8))).gan];
-  const rand = seededRandom(CUR.birth + "|" + CUR.hour + "|premium");
-  const pick = a => a[Math.floor(rand() * a.length)];
-  const STRENGTH = {
-    "木": { strong: ["决策快、点子多", "适合先跑起来再修正"], weak: ["容易想太多不敢开始", "适合找人搭伙补执行力"] },
-    "火": { strong: ["天生感染力强，适合露脸做内容", "搞钱靠人气，先把曝光做起来"], weak: ["情绪驱动型，需要固定节奏对抗三分钟热度", "适合做有积累的事而不是追热点"] },
-    "土": { strong: ["稳、能扛事，适合长线生意", "口碑是你的复利"], weak: ["启动慢，建议抄一个验证过的模板先干"] },
-    "金": { strong: ["标准严、手感准，适合精加工型服务", "客单价可以定得比同行高"], weak: ["容易过于挑剔错失时机，给自己定 48 小时决策线"] },
-    "水": { strong: ["信息嗅觉灵，适合信息差生意", "搞钱靠流动，多平台同步出击"], weak: ["选择太多反而耗损，每天最多开两条新线"] }
-  };
-  const s = STRENGTH[myW][rand() > 0.5 ? "strong" : "weak"];
-  const moneyPath = pick(["闲鱼虚拟服务", "小红书内容引流 + 私域成交", "众测/标注类任务", "帮商家做代运营"]);
-  $("premium-body").innerHTML =
-    `<p style="margin-bottom:10px"><b>命盘基调：</b>日主属<b>${myW}</b>，${s[0]}。</p>` +
-    `<p style="margin-bottom:10px"><b>搞钱路径：</b>你的命局更适合「${moneyPath}」——${s[1]}。</p>` +
-    `<p style="margin-bottom:10px"><b>节奏建议：</b>${pick(["宜先聚后散，先把一个渠道跑通再扩", "宜快打慢，抢占先机比完美更重要", "宜守不宜攻，这阶段少改方向多执行"])}</p>` +
-    `<p style="color:#a98ba6;font-size:11px">完整版将包含：夫妻宫/财帛宫/官禄宫逐宫解读 + 年度流年提示</p>`;
-  $("premium-box").classList.remove("hidden");
-  $("premium-box").scrollIntoView({ behavior: "smooth", block: "center" });
+
+// ================= 命盘报告生成 (免费体验版) =================
+function myDayGZ() {
+  const [by, bm, bd] = CUR.birth.split("-").map(Number);
+  return dayGZ(by, bm, bd);
 }
+function pick(rand, a) { return a[Math.floor(rand() * a.length)]; }
+function showReport(type) {
+  const [by, bm, bd] = CUR.birth.split("-").map(Number);
+  const dg = myDayGZ();
+  const myW = GAN_WUXING[dg.gan];
+  const rand = seededRandom(CUR.birth + "|" + CUR.hour + "|" + type);
+  const box = $("premium-box");
+  if (type === "r19") {
+    const STRENGTH = {
+      "木": { trait: "决策快、点子多，天生适合做「从 0 到 1」的事", weak: "容易想太多不敢开始，执行需要外力推一把",
+              path: ["轻资产的手艺型服务（写作/剪辑/设计接单）", "信息差生意：先人一步找到渠道再转手"], money: "正财为主，偏财谨慎", habit: "给自己定「48 小时开工线」，想到就做一半" },
+      "火": { trait: "感染力强、表达欲旺，天生适合露脸做内容和做转化", weak: "情绪驱动，容易三分钟热度，需要固定节奏对抗",
+              path: ["小红书/短视频内容引流 + 私域成交", "社群运营、直播类需要人气的工作"], money: "人气即财，曝光直接变现金", habit: "固定更新节奏（如每周三更）比爆款更重要" },
+      "土": { trait: "稳、能扛事、值得信任，适合需要长期口碑的事", weak: "启动偏慢，容易在观望中错过窗口期",
+              path: ["长线复购型生意（代运营/长期陪跑/会员制）", "标准化服务：流程做细，靠口碑转介绍"], money: "慢财稳财，复利型", habit: "先抄一个验证过的模板跑通，再谈创新" },
+      "金": { trait: "标准严、手感准、审美好，适合精加工型的高客单服务", weak: "过于挑剔容易错失时机，完美主义是隐形税",
+              path: ["高客单定制服务（精修/咨询/策划）", "质量控制类工作：把关本身就是价值"], money: "财在精不在多，单价可以高于同行", habit: "给自己定交付标准后不再反复改" },
+      "水": { trait: "信息嗅觉灵、适应力强，适合多平台流动型的生意", weak: "选择太多反而耗损，贪多必散",
+              path: ["信息差+多平台分发（一份内容多渠道变现）", "撮合/中介类：连接双方赚服务费"], money: "财在流动中，宜多渠道小额进账", habit: "每天最多开两条新线，跑通一条再开下一条" }
+    }[myW];
+    const path = pick(rand, STRENGTH.path);
+    const h = CUR.hour;
+    $("premium-title").textContent = "🧧 已解锁 · 天生搞钱方式分析（限时免费体验）";
+    $("premium-body").innerHTML =
+      `<p style="margin-bottom:10px"><b>① 命盘基调</b><br>你的日柱是 <b>${gzName(dg.idx)}</b>，日主属<b>${myW}</b>。${STRENGTH.trait}${h === "unknown" ? "" : "。结合你的出生时辰来看，这个特质会比较明显地体现在下午后的状态里"}。</p>` +
+      `<p style="margin-bottom:10px"><b>② 天生搞钱路径</b><br>你的命局与「${path}」最合拍。这条路的本质是：让别人替你放大你的天赋，而不是逼自己补短板。</p>` +
+      `<p style="margin-bottom:10px"><b>③ 财富风格</b><br>${STRENGTH.money}。适合把收入结构做成「${pick(rand, ["一主一辅", "多源小额", "一口深井", "一鱼多吃"])}」。</p>` +
+      `<p style="margin-bottom:10px"><b>④ 节奏建议</b><br>${pick(rand, ["宜先聚后散，把一个渠道跑通再扩", "宜快打慢，抢占先机比完美更重要", "宜守不宜攻，这阶段少改方向多执行"])}。${STRENGTH.habit}。</p>` +
+      `<p style="margin-bottom:10px"><b>⑤ 命主给的一句话</b><br>「${pick(rand, ["钱是价值的回声，先把自己活成答案", "别追风口，让风口追上正在做事的你", "慢慢来，比较快", "你的短板，雇人补；你的长板，放大到极致"])}」。</p>` +
+      `<p style="color:#a98ba6;font-size:11px">本报告为限时免费体验版（正式版将含逐宫深度解读）。仅供娱乐，不构成任何投资或职业建议。</p>`;
+  } else {
+    const PALACE = {
+      事业: { good: ["思路清晰，适合做需要规划感的位置", "手上有活，靠专业立身", "天生带说服力，适合面向人的岗位", "执行力强，是团队里把事落地的那个人"],
+              tip: ["这阶段最忌频繁换赛道，深挖一个方向", "主动争取一次展示机会，贵人会看见你", "把手头一件事做到 120 分，比开三件新事强"] },
+      财帛: { good: ["对数字敏感，理财意识天生在线", "财来财去但总能留下本金", "擅长把爱好变现", "节约型体质，聚沙成塔"],
+              tip: ["大额消费前冷静 24 小时", "设一个自动储蓄，先存后花", "避免借贷给熟人，损财又损情"] },
+      感情: { good: ["桃花质量高于数量，容易遇到同频的人", "真诚是最大杀器，套路在你身上失效", "感情里偏被动，但一旦认定就很稳", "魅力在细节里，熟人才看得见"],
+              tip: ["主动一点，缘分不会自己敲门", "别在情绪上头时下判断", "把期待说出来，别让人猜"] },
+      学业: { good: ["理解力强，擅长举一反三", "专注型选手，适合深啃难题", "记忆力好，临场发挥稳", "跨界学习能力强，杂学旁收"],
+              tip: ["输出倒逼输入，学完讲给别人听", "番茄钟比熬大夜适合你", "错题本是你最快的提分路径"] },
+      健康: { good: ["底子不错，恢复力强", "体质偏敏感，对环境变化反应快", "精力曲线偏夜型", "情绪影响身体明显，养心即养生"],
+              tip: ["23 点前放下手机，是你的头号养生", "每周三次出汗运动，气色立竿见影", "少喝冰的，你的脾胃在悄悄记账"] }
+    };
+    const sec = (name) => {
+      const p = PALACE[name];
+      return `<p style="margin-bottom:10px"><b>${name}宫</b>（${pick(rand, ["旺", "稳", "升", "守"])}）<br>${pick(rand, p.good)}。${pick(rand, p.tip)}。</p>`;
+    };
+    const yearG = yearGZ(by, bm);
+    $("premium-title").textContent = "👑 已解锁 · 完整命盘报告（限时免费体验）";
+    $("premium-body").innerHTML =
+      `<p style="margin-bottom:10px"><b>命盘概览</b><br>日柱 <b>${gzName(dg.idx)}</b> · 日主<b>${GAN[dg.gan]}${myW}</b> · 生年 <b>${yearG.name}</b>（${SHENGXIAO[yearG.zhi]}年）${CUR.hour === "unknown" ? "" : " · " + HOURS[CUR.hour]}。五行格局：<b>${myW}</b>为主${myW === GAN_WUXING[yearG.idx % 10] ? "，与生年同气，格局偏纯" : "，与生年相异，格局富变化"}。</p>` +
+      sec("事业") + sec("财帛") + sec("感情") + sec("学业") + sec("健康") +
+      `<p style="margin-bottom:10px"><b>年度流年提示</b><br>${pick(rand, ["今年宜「守正出新」：主线不动，副线试新", "今年宜「广结善缘」：贵人藏在人堆里", "今年宜「深耕内功」：外部机会平淡，正好修炼", "今年宜「小步快跑」：试错成本低，大胆试"])}</p>` +
+      `<p style="color:#a98ba6;font-size:11px">本报告为限时免费体验版（正式版将含十二宫完整排盘与流年逐月提示）。基于传统命理规则的娱乐化演绎，仅供娱乐，不构成任何医疗、投资或婚恋建议。</p>`;
+  }
+  box.classList.remove("hidden");
+  box.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
 $("birth").addEventListener("change", () => showMsg(""));
 </script>
 </body>
