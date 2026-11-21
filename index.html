@@ -103,6 +103,10 @@
   .stars { color: var(--gold); letter-spacing: 2px; }
   .desc { font-size: 14px; line-height: 1.8; color: #d5d0e8; margin-top: 12px; }
   .tip-title { font-size: 15px; font-weight: 600; color: var(--gold); margin: 14px 0 6px; }
+  .rule-tag {
+    display: inline-block; font-size: 11px; color: var(--purple);
+    border: 1px solid var(--purple); border-radius: 999px; padding: 2px 8px; margin-top: 10px;
+  }
   .upsell {
     background: linear-gradient(120deg, #2a1f4d, #1c1930);
     border: 1px solid var(--gold);
@@ -133,7 +137,7 @@
 <div id="input-view">
   <span class="badge">仅供娱乐 · 不构成任何真实预测</span>
   <h1>今日好运指数</h1>
-  <p class="sub">输入你的生日，看看今天的星象能量站在你这边吗？<br>同一生日每天结果固定，测完可以和朋友对比～</p>
+  <p class="sub">输入你的生辰，按传统黄历干支历法计算今日能量<br>同一生辰每天结果固定，测完可以和朋友对比～</p>
 
   <div class="card">
     <label>你的生日</label>
@@ -163,7 +167,7 @@
     <button id="go-btn">✨ 测今日好运</button>
     <div id="msg" style="color:#f08a8a;font-size:13px;margin-top:10px;min-height:18px;"></div>
   </div>
-  <p class="footer">本测试基于传统历法的娱乐化演绎，结果随机生成、仅供消遣。<br>请勿将结果作为任何现实决策依据。</p>
+  <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎，结果仅供参考消遣。<br>请勿将结果作为任何现实决策依据。</p>
 </div>
 
 <div id="result-view" class="hidden">
@@ -177,6 +181,7 @@
     </div>
     <div class="verdict" id="verdict"></div>
     <div class="desc" id="summary"></div>
+    <div class="rule-tag" id="rule-line"></div>
   </div>
 
   <div class="card">
@@ -187,9 +192,11 @@
   </div>
 
   <div class="card">
+    <div class="tip-title">📅 今日黄历</div>
+    <div class="desc" id="almanac"></div>
     <div class="tip-title">🔮 今日宜</div>
     <div class="desc" id="do-list"></div>
-    <div class="tip-title">⚠️ 今日注意</div>
+    <div class="tip-title">⚠️ 今日忌</div>
     <div class="desc" id="dont-list"></div>
     <div class="tip-title">🎨 幸运色 & 数字</div>
     <div class="desc" id="lucky"></div>
@@ -201,16 +208,99 @@
 
   <div class="upsell">
     <h3>想看更深度的吗？</h3>
-    <p>你的生日里还藏着一套完整的<br><b style="color:var(--gold)">「天生搞钱方式」分析</b><br>——你适合稳扎稳打还是风口起飞？</p>
+    <p>你的生辰里还藏着一套完整的<br><b style="color:var(--gold)">「天生搞钱方式」分析</b><br>——按紫微命盘规则排盘解读，同一生辰结果永远一致</p>
     <button id="upsell-btn">🔓 解锁完整报告 ¥1.9</button>
   </div>
 
-  <button class="share-btn" onclick="back()">↩️ 测别的日期</button>
-  <p class="footer">本测试基于传统历法的娱乐化演绎，结果随机生成、仅供消遣。<br>请勿将结果作为任何现实决策依据。</p>
+  <button class="share-btn" onclick="back()">↩️ 重新输入</button>
+  <p class="footer">本测试基于传统黄历与干支历法的娱乐化演绎，结果仅供参考消遣。<br>请勿将结果作为任何现实决策依据。本页不保存任何个人信息。</p>
 </div>
 
 <script>
-// ---- 确定性伪随机: 同一生日+同一日期 => 同一结果 ----
+// ================= 干支历法引擎 (传统规则, 非随机) =================
+const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+const ZHI = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const GAN_WUXING = ["木","木","火","火","土","土","金","金","水","水"]; // 甲乙木 丙丁火 戊己土 庚辛金 壬癸水
+const ZHI_WUXING = ["水","土","木","木","土","火","火","土","金","金","土","水"]; // 子水 丑土 寅卯木 辰土 巳午火 未土 申酉金 戌土 亥水
+const SHENGXIAO = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"];
+
+// 儒略日: 公历 -> JDN
+function toJDN(y, m, d) {
+  const a = Math.floor((14 - m) / 12);
+  const y2 = y + 4800 - a;
+  const m2 = m + 12 * a - 3;
+  return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
+}
+
+// 干支纪日锚点: 1949-10-01 为甲子日
+const ANCHOR_JDN = toJDN(1949, 10, 1);
+function dayGZ(y, m, d) {
+  const idx = ((toJDN(y, m, d) - ANCHOR_JDN) % 60 + 60) % 60;
+  return { gan: idx % 10, zhi: idx % 12, idx: idx };
+}
+function gzName(i) { return GAN[i % 10] + ZHI[i % 12]; }
+
+// 年干支 (以立春2月4日为界, 近似)
+function yearGZ(y, m) {
+  const yy = (m >= 2 || m <= 1 && false) ? y : y; // 简化: 2月起算当年
+  const y2 = m >= 2 ? yy : yy - 1;
+  const idx = ((y2 - 1984) % 60 + 60) % 60; // 1984年为甲子年
+  return { name: gzName(idx), zhi: idx % 12, idx: idx };
+}
+
+// 月支 (按节气近似日期)
+function monthZhi(m, d) {
+  // 节气近似: 立春2/4 惊蛰3/6 清明4/5 立夏5/6 芒种6/6 小暑7/7 立秋8/8 白露9/8 寒露10/8 立冬11/7 大雪12/7 小寒1/6
+  const terms = [[2,4,2],[3,6,3],[4,5,4],[5,6,5],[6,6,6],[7,7,7],[8,8,8],[9,8,9],[10,8,10],[11,7,11],[12,7,12]];
+  let mz = 1; // 1月(小寒后~立春前)为丑月(索引1)
+  // 节气后进入对应地支月: 立春(2/4)起为寅月(索引2), 立冬(11/7)起为亥月(索引11)
+  if (m === 1) return d >= 6 ? 1 : 1; // 小寒后丑月
+  for (const [tm, td, idx] of terms) {
+    if (m > tm || (m === tm && d >= td)) mz = idx;
+  }
+  return mz;
+}
+
+// 十二建星: 建除满平定执破危成收开闭
+const JIANXING = ["建","除","满","平","定","执","破","危","成","收","开","闭"];
+function jianXing(y, m, d) {
+  const mz = monthZhi(m, d);         // 月支索引
+  const dz = dayGZ(y, m, d).zhi;     // 日支索引
+  return JIANXING[((dz - mz) % 12 + 12) % 12];
+}
+
+// 建星 -> 宜忌 (传统黄历通行口径, 娱乐化精简)
+const JIAN_RULE = {
+  "建": { yi: ["出行", "求职", "开始新计划"], ji: ["动土", "与人争执"], tip: "建日万物始生，宜开新局" },
+  "除": { yi: ["打扫除旧", "看病调理", "断舍离"], ji: ["签约", "远行"], tip: "除日宜除旧布新" },
+  "满": { yi: ["聚会", "置办物品", "庆祝"], ji: ["就医", "打官司"], tip: "满日丰盈，忌过度" },
+  "平": { yi: ["日常事务", "修整", "平稳推进"], ji: ["大额消费", "重大决定"], tip: "平日守成，稳字当头" },
+  "定": { yi: ["签约", "定计划", "告白"], ji: ["搬家", "远行"], tip: "定日宜定事宜" },
+  "执": { yi: ["执行既定计划", "健身", "专注攻坚"], ji: ["开新项目"], tip: "执日宜执守不宜开新" },
+  "破": { yi: ["破除坏习惯", "清理债务"], ji: ["签约", "开业", "嫁娶", "远行"], tip: "破日诸事不宜大事，宜破不宜立" },
+  "危": { yi: ["安坐学习", "复盘"], ji: ["冒险", "登高", "冲动消费"], tip: "危日宜静不宜动" },
+  "成": { yi: ["完成收尾", "签约", "庆祝成果"], ji: ["诉诸争执"], tip: "成日诸事可成" },
+  "收": { yi: ["收款", "收纳", "总结"], ji: ["开启新事务", "置办大件"], tip: "收日宜收不宜放" },
+  "开": { yi: ["开业", "面试", "社交", "开始学习"], ji: ["安葬", "保守秘密"], tip: "开日开放，宜动不宜静" },
+  "闭": { yi: ["休息", "静养", "闭门复盘"], ji: ["出行", "社交", "开新局"], tip: "闭日宜闭不宜开" }
+};
+
+// 五行关系: 返回 [{rel, desc}] 相对 dayGan
+function wuxingRelation(myGan, todayGan) {
+  const my = GAN_WUXING[myGan], to = GAN_WUXING[todayGan];
+  const order = ["木","火","土","金","水"];
+  const diff = (order.indexOf(to) - order.indexOf(my) + 5) % 5;
+  // diff 0=同 1=我生 2=我克 3=克我 4=生我
+  return [
+    { rel: "同我", key: 0, level: 62, label: "比肩帮身" },
+    { rel: "我生", key: 1, level: 55, label: "泄气付出" },
+    { rel: "我克", key: 2, level: 70, label: "掌控得财" },
+    { rel: "克我", key: 3, level: 42, label: "受制谨慎" },
+    { rel: "生我", key: 4, level: 78, label: "得生得助" }
+  ][diff];
+}
+
+// 确定性微调 (同命盘同日固定, 使四维有差异)
 function seededRandom(seedStr) {
   let h = 1779033703 ^ seedStr.length;
   for (let i = 0; i < seedStr.length; i++) {
@@ -225,49 +315,41 @@ function seededRandom(seedStr) {
   };
 }
 
-const VERDICTS = [
-  [85, "🌟 大吉 · 星象超燃"], [85, "🌟 大吉 · 星象超燃"],
-  [70, "☀️ 小吉 · 顺水行舟"], [70, "☀️ 小吉 · 顺水行舟"], [70, "☀️ 小吉 · 顺水行舟"],
-  [58, "🌤 平稳 · 稳字当头"], [58, "🌤 平稳 · 稳字当头"], [58, "🌤 平稳 · 稳字当头"], [58, "🌤 平稳 · 稳字当头"],
-  [45, "🌥 微凉 · 少动多看"]
-];
-
-const DO_POOL = ["主动联系一位重要的人", "把拖了很久的小事清掉", "当众表达你的想法", "整理你的桌面和待办", "尝试一件 15 分钟内的新鲜事", "给身边的人一个小惊喜", "复盘最近的支出", "早睡一小时", "出门散步晒晒太阳", "写下一件本周想完成的事"];
-const DONT_POOL = ["冲动消费超过预算", "和杠精争辩到深夜", "把重要决定拖到最后一刻", "深夜做重大决定", "答应自己做不到的事", "熬夜刷手机到两点", "借钱给不太熟的人", "在饥饿时逛购物软件"];
-const COLORS = [
-  ["金色 / 奶油白", 3, 7], ["雾紫色 / 深蓝", 2, 9], ["暖橙色 / 米色", 1, 6],
-  ["墨绿色 / 银灰", 5, 8], ["樱桃红 / 象牙白", 4, 2]
-];
-const SUM_P = {
-  85: ["今天星象能量整体偏高，适合推进重要的事——你近期的某个念头值得在今天动手迈出第一步。"]
-  , 70: ["今天整体顺遂，没有明显的坑，适合按计划推进日常事项，遇到小机会可以顺手抓住。"],
-  58: ["今天能量平稳，不出彩也不踩坑，适合处理积累的事务，把节奏稳住就是赢。"],
-  45: ["今天星象偏静，重要的事建议缓一缓，多观察少出手，把时间留给思考和休息。"]
-};
 const GENDER_TONE = { f: "姐妹", m: "兄弟", x: "朋友" };
-
 function stars(n) { return "★".repeat(n) + "☆".repeat(5 - n); }
-
 function showMsg(t) { const m = document.getElementById("msg"); if (m) m.textContent = t; }
 
 function run() {
   let birth = document.getElementById("birth").value;
   if (!birth) {
-    birth = "1998-06-15"; // 无输入时用默认生日, 保证按钮始终有反应
+    birth = "1998-06-15";
     showMsg("未选生日，已用示例生日 1998-06-15 演示");
   }
   const gender = document.getElementById("gender").value;
-  const hour = document.getElementById("hour") ? document.getElementById("hour").value : "unknown";
+  const hour = document.getElementById("hour").value;
+  const [by, bm, bd] = birth.split("-").map(Number);
   const today = new Date();
-  const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  const rand = seededRandom(birth + "|" + hour + "|" + dateStr);
+  const ty = today.getFullYear(), tm = today.getMonth() + 1, td = today.getDate();
+  const dateStr = `${ty}-${String(tm).padStart(2, "0")}-${String(td).padStart(2, "0")}`;
 
-  // 挑一个 verdict 档位 (加权后仍由种子决定, 确定性)
-  const pick = VERDICTS[Math.floor(rand() * VERDICTS.length)];
-  const base = pick[0];
-  const score = base + Math.floor(rand() * 10) - 5; // 档位内浮动
-  const tone = GENDER_TONE[gender];
+  // ---- 传统规则计算 ----
+  const myDay = dayGZ(by, bm, bd);              // 用户日柱 (日主)
+  const todayDay = dayGZ(ty, tm, td);           // 今日日柱
+  const jx = jianXing(ty, tm, td);              // 十二建星
+  const rule = JIAN_RULE[jx];
+  const rel = wuxingRelation(myDay.gan, todayDay.gan); // 日主与今日干支关系
+  const yGZ = yearGZ(ty, tm);
 
+  // 综合分 = 建星基础分(60%权重) + 五行关系分(40%权重), 各自规则映射
+  const jianScore = { "建":72,"除":65,"满":70,"平":60,"定":72,"执":65,"破":45,"危":48,"成":80,"收":62,"开":75,"闭":50 }[jx];
+  const score = Math.round(jianScore * 0.6 + rel.level * 0.4);
+
+  // 命主五行与幸运色 (按日主五行, 传统配色)
+  const wx = GAN_WUXING[myDay.gan];
+  const colorMap = { "木": "青色/绿色系", "火": "红色/橙色系", "土": "黄色/棕色系", "金": "白色/金色系", "水": "黑色/蓝色系" };
+  const numMap = { "木": [3, 8], "火": [2, 7], "土": [5, 10], "金": [4, 9], "水": [1, 6] };
+
+  // 展示
   document.getElementById("date-tag").textContent = dateStr + " · 仅供娱乐";
   const hourName = { "unknown": "时辰未提供" };
   document.querySelectorAll("#hour option").forEach(o => hourName[o.value] = o.textContent.split(" ")[0]);
@@ -275,61 +357,75 @@ function run() {
     `测算档案：${birth} · ${hourName[hour] || hour} · ${gender === "f" ? "女" : gender === "m" ? "男" : "保密"}（本页不保存任何信息）`;
   document.getElementById("score").textContent = score;
   document.getElementById("ring").style.setProperty("--s", score);
-  document.getElementById("verdict").textContent = pick[1];
 
-  const sumPool = SUM_P[base] || SUM_P[58];
+  const verdictText = score >= 75 ? "🌟 大吉 · 星象超燃" : score >= 62 ? "☀️ 小吉 · 顺水行舟" : score >= 52 ? "🌤 平稳 · 稳字当头" : "🌥 微凉 · 少动多看";
+  document.getElementById("verdict").textContent = verdictText;
+
   document.getElementById("summary").textContent =
-    `${tone}，` + sumPool[0] + (score >= 75 ? " 今天请大胆一点。" : score >= 55 ? " 保持你的节奏就好。" : " 保存实力，明天再战。");
+    `${GENDER_TONE[gender]}，你的日主是「${GAN[myDay.gan]}${wx}」，今日为「${gzName(todayDay.idx)}」日，与你的日主构成【${rel.label}】关系——` +
+    (rel.key === 4 ? "今日得生得助，贵人能量强，适合推进重要的事。" :
+     rel.key === 2 ? "今日你占主导位，适合谈钱谈合作，掌控节奏。" :
+     rel.key === 0 ? "今日能量与你同频，稳扎稳打就好。" :
+     rel.key === 1 ? "今日宜输出宜表达，但注意别过度消耗自己。" :
+     "今日受制之日，少出手多观察，保存实力最重要。") +
+    ` 今日建星「${jx}」——${rule.tip}。`;
 
-  // 四维 (基于同一种子, 与总分相关但各有波动)
-  const dim = (b) => Math.max(1, Math.min(5, Math.round((score / 100) * 5 + (rand() * 1.6 - 0.8)) + (b ? 0 : 0)));
-  document.getElementById("s-wealth").textContent = stars(dim());
-  document.getElementById("s-noble").textContent = stars(dim());
-  document.getElementById("s-love").textContent = stars(dim());
-  document.getElementById("s-action").textContent = stars(dim());
+  document.getElementById("rule-line").textContent =
+    `计算依据：今日${gzName(todayDay.idx)}日 · ${yGZ.name}年 · 建星「${jx}」 · 日主${GAN[myDay.gan]}${wx} vs 今日${GAN_WUXING[todayDay.gan]} → ${rel.label}`;
 
-  // 宜 / 忌: 各取2条
-  const pickN = (arr, n) => { const a = [...arr]; const out = []; for (let i = 0; i < n; i++) out.push(a.splice(Math.floor(rand() * a.length), 1)[0]); return out; };
-  document.getElementById("do-list").innerHTML = "✅ " + pickN(DO_POOL, 2).join("<br>✅ ");
-  document.getElementById("dont-list").innerHTML = "🚫 " + pickN(DONT_POOL, 2).join("<br>🚫 ");
+  // 四维: 在综合分基础上按规则微调 (确定性)
+  const rand = seededRandom(birth + "|" + hour + "|" + dateStr + "|dim");
+  const dimScore = (bias) => Math.max(1, Math.min(5, Math.round((score / 100) * 5 + bias + (rand() * 1.4 - 0.7))));
+  // 财运偏向"我克/成/开"日, 贵人偏向"生我/满/成", 桃花偏向"定/开", 行动偏向"建/执/开"
+  const jxBoost = { "建":1,"除":0,"满":0,"平":-1,"定":0,"执":1,"破":-2,"危":-1,"成":1,"收":0,"开":1,"闭":-1 };
+  document.getElementById("s-wealth").textContent = stars(dimScore(rel.key === 2 ? 1 : rel.key === 3 ? -1 : 0 + jxBoost[jx] * 0.5));
+  document.getElementById("s-noble").textContent = stars(dimScore(rel.key === 4 ? 1 : jxBoost[jx] * 0.5));
+  document.getElementById("s-love").textContent = stars(dimScore(jx === "定" || jx === "满" ? 1 : jxBoost[jx] * 0.5));
+  document.getElementById("s-action").textContent = stars(dimScore(jxBoost[jx]));
 
-  const lucky = COLORS[Math.floor(rand() * COLORS.length)];
-  document.getElementById("lucky").textContent = `幸运色：${lucky[0]} ｜ 幸运数字：${lucky[1]}、${lucky[2]}`;
+  // 黄历区
+  document.getElementById("almanac").textContent =
+    `今日 ${dateStr}｜${yGZ.name}年 · ${gzName(todayDay.idx)}日 · 十二建星「${jx}」｜生肖日：${SHENGXIAO[todayDay.zhi]}`;
+
+  // 宜忌: 建星规则 + 确定性补充
+  const rand2 = seededRandom(birth + "|" + hour + "|" + dateStr + "|yiji");
+  const extraYi = ["多喝水早休息", "整理待办清单", "给家人打个电话", "学习半小时", "散步二十分钟"];
+  const extraJi = ["熬夜刷手机", "与人硬刚", "深夜剁手", "过度承诺"];
+  const pickN = (arr, n) => { const a = [...arr]; const out = []; for (let i = 0; i < n; i++) out.push(a.splice(Math.floor(rand2() * a.length), 1)[0]); return out; };
+  document.getElementById("do-list").innerHTML =
+    "✅ " + rule.yi.map(s => s).join("、") + "<br>✅ " + pickN(extraYi, 2).join("<br>✅ ");
+  document.getElementById("dont-list").innerHTML =
+    "🚫 " + rule.ji.join("、") + "<br>🚫 " + pickN(extraJi, 1).join("<br>🚫 ");
+
+  document.getElementById("lucky").textContent = `按你日主五行（${wx}）：幸运色 ${colorMap[wx]} ｜ 幸运数字 ${numMap[wx].join("、")}`;
 
   document.getElementById("input-view").classList.add("hidden");
   document.getElementById("result-view").classList.remove("hidden");
   window.scrollTo(0, 0);
-
-  // 存最近一次记录, 方便"分享"文案
-  window.__lastResult = { date: dateStr, score, verdict: pick[1] };
+  window.__lastResult = { date: dateStr, score, verdict: verdictText };
 }
 
 function share() {
   const r = window.__lastResult;
-  const text = `我在「今日好运指数」测了 ${r.date} 的运势：${r.score} 分 ${r.verdict}\n快来测测你的：`;
+  const text = `我在「今日好运指数」测了 ${r.date} 的运势：${r.score} 分 ${r.verdict}\n按传统黄历干支计算，快来测你的：`;
   try { navigator.clipboard.writeText(text); showShareTip(text); }
   catch (e) { showShareTip(text); }
 }
-
 function showShareTip(text) {
   const el = document.getElementById("share-tip");
-  if (el) { el.textContent = "👇 分享文案已生成，长按复制：" ; document.getElementById("share-text").textContent = text; }
+  if (el) { el.textContent = "👇 分享文案已生成，长按复制："; document.getElementById("share-text").textContent = text; }
   else { window.prompt("复制以下文案分享：", text); }
 }
-
 function back() {
   document.getElementById("result-view").classList.add("hidden");
   document.getElementById("input-view").classList.remove("hidden");
   window.scrollTo(0, 0);
 }
-
-// 事件绑定 (不依赖内联 onclick)
 document.getElementById("go-btn").addEventListener("click", run);
 document.getElementById("upsell-btn").addEventListener("click", function () {
-  const el = document.getElementById("share-tip");
-  el.textContent = "💡 付费模块开发中——上线后此处将跳转店铺商品页";
+  document.getElementById("share-tip").textContent = "💡 付费模块开发中——上线后此处将跳转店铺商品页";
 });
-document.getElementById("birth").addEventListener("change", function(){ showMsg(""); });
+document.getElementById("birth").addEventListener("change", function () { showMsg(""); });
 </script>
 </body>
 </html>
