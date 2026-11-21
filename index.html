@@ -10,59 +10,88 @@
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
     background: linear-gradient(160deg, #ffe9f1 0%, #ffd6e8 40%, #e8d5ff 100%);
     min-height: 100vh; max-width: 480px; margin: 0 auto;
-    padding: 30px 20px 60px; color: #4a3b52; position: relative;
+    padding: 30px 20px 110px; color: #4a3b52; position: relative; overflow-x: hidden;
   }
-  .card {
-    background: rgba(255,255,255,.72); backdrop-filter: blur(12px);
-    border-radius: 26px; padding: 22px 20px;
-    box-shadow: 0 12px 40px rgba(220,120,180,.2);
-    margin-bottom: 16px;
-  }
-  .head { text-align: center; margin-bottom: 26px; }
+  .deco { position: fixed; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.75), rgba(255,255,255,0) 70%); pointer-events: none; z-index: 0; }
+  .wrap { position: relative; z-index: 2; }
+  .head { text-align: center; margin-bottom: 14px; }
   .head h1 { font-size: 30px; letter-spacing: 3px; color: #3d2e46; font-weight: 800; text-shadow: 0 2px 0 #fff, 0 4px 14px rgba(233,142,192,.35); }
   .head .en { font-size: 11px; color: #9a7d96; letter-spacing: 3px; margin-top: 8px; }
-  .badge {
-    display: inline-block; margin-top: 12px; font-size: 12px; color: #c96aa0;
-    background: linear-gradient(120deg, #ffe0ec, #ece0ff); border-radius: 999px; padding: 5px 16px; font-weight: 600;
+  .date-line { text-align: center; font-size: 12px; color: #9a7d96; margin-bottom: 20px; }
+  .date-line b { color: #d4548f; }
+  .card {
+    background: rgba(255,255,255,.72); backdrop-filter: blur(12px);
+    border-radius: 26px; padding: 20px; box-shadow: 0 12px 40px rgba(220,120,180,.2);
+    margin-bottom: 16px;
   }
+  /* 今日主卡 */
+  .today-card {
+    background: linear-gradient(135deg, rgba(255,255,255,.85), rgba(255,240,246,.85));
+    border: 1.5px solid rgba(255,194,218,.8);
+  }
+  .tc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .tc-title { font-size: 16px; font-weight: 800; color: #3d2e46; }
+  .tc-gz { font-size: 11px; color: #8d6fd0; background: rgba(146,84,222,.08); border: 1px solid rgba(146,84,222,.25); border-radius: 999px; padding: 3px 10px; }
+  .tc-moon { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #9a7d96; margin-bottom: 14px; }
+  .tc-theme { font-size: 14px; line-height: 1.8; color: #4a3b52; margin-bottom: 14px; }
+  .tc-lucky { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tc-lucky div { background: rgba(255,255,255,.8); border-radius: 12px; padding: 8px 10px; font-size: 12px; color: #7a6588; }
+  .tc-lucky b { color: #4a3b52; }
+  .tc-more { display: block; text-align: center; margin-top: 12px; font-size: 12px; color: #d4548f; text-decoration: none; font-weight: 700; }
+  /* 功能宫格 */
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-  .tile {
-    border-radius: 20px; padding: 18px 16px; cursor: pointer; position: relative;
-    transition: transform .15s; min-height: 120px; display: flex; flex-direction: column; justify-content: space-between;
-  }
+  .tile { border-radius: 20px; padding: 18px 16px; cursor: pointer; position: relative; transition: transform .15s; min-height: 118px; display: flex; flex-direction: column; justify-content: space-between; }
   .tile:active { transform: scale(.97); }
   .t-pink { background: #ffe0ec; } .t-purple { background: #ece0ff; }
   .t-orange { background: #fff0db; } .t-green { background: #e2f7d9; }
   .tile .icon { font-size: 24px; }
   .tile .name { font-size: 16px; font-weight: 700; color: #3d2e46; margin-top: 10px; }
   .tile .desc { font-size: 11px; color: #8a6b88; margin-top: 4px; line-height: 1.6; }
-  .tile .soon {
-    position: absolute; top: 10px; right: 10px; font-size: 9px; color: #fff;
-    background: rgba(180,140,180,.55); border-radius: 999px; padding: 2px 8px;
-  }
-  .wide {
-    background: linear-gradient(120deg, #ff9ec7, #c9a7ff); border-radius: 20px;
-    padding: 18px 16px; margin-bottom: 16px; cursor: pointer;
-    box-shadow: 0 10px 28px rgba(233,142,192,.4);
-  }
+  .tile .soon { position: absolute; top: 10px; right: 10px; font-size: 9px; color: #fff; background: rgba(180,140,180,.55); border-radius: 999px; padding: 2px 8px; }
+  .wide { background: linear-gradient(120deg, #ff9ec7, #c9a7ff); border-radius: 20px; padding: 18px 16px; margin-bottom: 16px; cursor: pointer; box-shadow: 0 10px 28px rgba(233,142,192,.4); }
   .wide:active { transform: scale(.98); }
   .wide .icon { font-size: 22px; }
   .wide .name { color: #fff; font-size: 16px; font-weight: 800; margin-top: 8px; }
   .wide .desc { color: rgba(255,255,255,.92); font-size: 11px; margin-top: 4px; line-height: 1.6; }
-  .toast {
-    position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%);
-    background: rgba(61,46,70,.9); color: #fff; font-size: 13px;
-    border-radius: 999px; padding: 10px 20px; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 9;
-  }
+  .toast { position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%); background: rgba(61,46,70,.9); color: #fff; font-size: 13px; border-radius: 999px; padding: 10px 20px; opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 99; }
   .toast.show { opacity: 1; }
   .footer { text-align: center; font-size: 10px; color: #b195ad; line-height: 1.8; margin-top: 8px; }
+  /* 底部导航 */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; z-index: 60;
+    background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+    display: flex; padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(220,120,180,.2);
+  }
+  .bn-item { flex: 1; text-align: center; font-size: 10px; color: #b195ad; text-decoration: none; padding: 4px 0; }
+  .bn-item .bn-icon { font-size: 18px; display: block; margin-bottom: 1px; filter: grayscale(1) opacity(.6); }
+  .bn-item.active { color: #d4548f; font-weight: 700; }
+  .bn-item.active .bn-icon { filter: none; }
 </style>
 </head>
 <body>
+<div class="deco" style="width:220px;height:220px;top:-60px;left:-60px;"></div>
+<div class="deco" style="width:160px;height:160px;bottom:140px;right:-50px;"></div>
+
+<div class="wrap">
   <div class="head">
     <h1>✨ 今日好运研究所 ✨</h1>
     <div class="en">DAILY LUCK · MAKE EVERY DAY MAGICAL</div>
-    <div class="badge">💕 笑着看看运势，每天一个好心情</div>
+  </div>
+  <div class="date-line" id="date-line"></div>
+
+  <!-- 今日主卡 -->
+  <div class="card today-card">
+    <div class="tc-head"><div class="tc-title">今日黄历速览</div><div class="tc-gz" id="tc-gz"></div></div>
+    <div class="tc-moon"><span id="tc-moon-svg"></span><span id="tc-moon"></span></div>
+    <div class="tc-theme" id="tc-theme"></div>
+    <div class="tc-lucky">
+      <div>今日色 <b id="tc-color"></b></div>
+      <div>今日数 <b id="tc-num"></b></div>
+      <div>宜 <b id="tc-yi"></b></div>
+      <div>忌 <b id="tc-ji"></b></div>
+    </div>
+    <a class="tc-more" href="fortune.html">输入生辰看你的专属运势 →</a>
   </div>
 
   <div class="grid">
@@ -70,10 +99,9 @@
       <div class="icon">🌸</div>
       <div><div class="name">每日运势</div><div class="desc">今日财运、桃花、贵人、行动力</div></div>
     </div>
-    <div class="tile t-purple" onclick="soon('每日塔罗')">
+    <div class="tile t-purple" onclick="go('tarot.html')">
       <div class="icon">🃏</div>
-      <div><div class="name">每日塔罗</div><div class="desc">抽一张牌，看看今日提示</div></div>
-      <div class="soon">开发中</div>
+      <div><div class="name">每日塔罗</div><div class="desc">洗牌 · 抽牌 · 看今日提示</div></div>
     </div>
     <div class="tile t-orange" onclick="go('stars.html')">
       <div class="icon">♓</div>
@@ -86,25 +114,102 @@
     </div>
   </div>
 
-  <div class="wide" onclick="soon('专属好运报告')">
+  <div class="wide" onclick="go('fortune.html')">
     <div class="icon">💌</div>
-    <div class="name">专属好运报告</div>
-    <div class="desc">根据出生资料生成个性化内容，支持分享精美图片</div>
+    <div class="name">专属好运报告 · 限时免费</div>
+    <div class="desc">天生搞钱方式分析 + 紫微十二宫完整命盘</div>
   </div>
 
   <p class="footer">所有内容仅供娱乐，不构成任何真实预测<br>请勿作为现实决策依据 · 本站不保存任何个人信息</p>
+</div>
 
-  <div class="toast" id="toast"></div>
-  <script>
-    function go(url) { location.href = url; }
-    let timer = null;
-    function soon(name) {
-      const t = document.getElementById("toast");
-      t.textContent = "「" + name + "」模块开发中，敬请期待 💕";
-      t.classList.add("show");
-      clearTimeout(timer);
-      timer = setTimeout(() => t.classList.remove("show"), 2200);
-    }
-  </script>
+<nav class="bottom-nav">
+  <a class="bn-item active" href="index.html"><span class="bn-icon">🏠</span>首页</a>
+  <a class="bn-item" href="fortune.html"><span class="bn-icon">🌸</span>运势</a>
+  <a class="bn-item" href="tarot.html"><span class="bn-icon">🃏</span>塔罗</a>
+  <a class="bn-item" href="stars.html"><span class="bn-icon">♓</span>星座</a>
+  <a class="bn-item" href="javascript:void(0)" onclick="soon('我的')"><span class="bn-icon">👤</span>我的</a>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script src="lunar.js"></script>
+<script>
+// ============ 精简干支引擎 (首页黄历用) ============
+const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+const ZHI = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const SHENGXIAO = ["鼠","牛","虎","兔","龙","蛇","马","羊","猴","鸡","狗","猪"];
+const JIANXING = ["建","除","满","平","定","执","破","危","成","收","开","闭"];
+function toJDN(y, m, d) {
+  const a = Math.floor((14 - m) / 12);
+  const y2 = y + 4800 - a, m2 = m + 12 * a - 3;
+  return d + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
+}
+function gzName(i) { return GAN[i % 10] + ZHI[i % 12]; }
+function dayGZ(y, m, d) { return ((toJDN(y, m, d) - toJDN(1949, 10, 1)) % 60 + 60) % 60; }
+function yearGZ(y, m) { const y2 = m >= 2 ? y : y - 1; return ((y2 - 1984) % 60 + 60) % 60; }
+function monthZhi(m, d) {
+  const terms = [[2,4,2],[3,6,3],[4,5,4],[5,6,5],[6,6,6],[7,7,7],[8,8,8],[9,8,9],[10,8,10],[11,7,11],[12,7,12]];
+  if (m === 1) return 1;
+  let mz = 1;
+  for (const [tm, td, idx] of terms) if (m > tm || (m === tm && d >= td)) mz = idx;
+  return mz;
+}
+function jianXing(y, m, d) { return JIANXING[((dayGZ(y, m, d) % 12 - monthZhi(m, d)) % 12 + 12) % 12]; }
+function seededRandom(seedStr) {
+  let h = 1779033703 ^ seedStr.length;
+  for (let i = 0; i < seedStr.length; i++) { h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+  return function () { h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+}
+const JIAN_THEME = {
+  "建": { t: "万物始生的一天，适合开新局", yi: ["开始新计划","出行"], ji: ["与人争执"], c: "珊瑚粉", n: 7 },
+  "除": { t: "除旧布新的一天，适合整理和断舍离", yi: ["打扫除旧","断舍离"], ji: ["签约"], c: "薄荷绿", n: 3 },
+  "满": { t: "丰盈的一天，宜庆祝忌过度", yi: ["聚会","庆祝"], ji: ["打官司"], c: "香芋紫", n: 8 },
+  "平": { t: "平稳的一天，稳字当头", yi: ["日常推进"], ji: ["大额消费"], c: "奶油白", n: 5 },
+  "定": { t: "宜定事宜的一天，适合告白和签约", yi: ["签约","告白"], ji: ["搬家"], c: "樱花粉", n: 2 },
+  "执": { t: "宜执守的一天，专注攻坚", yi: ["专注攻坚"], ji: ["开新项目"], c: "雾灰", n: 6 },
+  "破": { t: "宜破不宜立的一天，适合破除坏习惯", yi: ["破除坏习惯"], ji: ["签约","远行"], c: "雾霾蓝", n: 1 },
+  "危": { t: "宜静不宜动的一天，适合安坐学习", yi: ["安坐学习","复盘"], ji: ["冒险"], c: "湖蓝", n: 9 },
+  "成": { t: "诸事可成的一天，宜庆祝成果", yi: ["完成收尾","庆祝"], ji: ["争执"], c: "柠檬黄", n: 4 },
+  "收": { t: "宜收不宜放的一天，适合收款和总结", yi: ["收款","总结"], ji: ["置办大件"], c: "焦糖色", n: 0 },
+  "开": { t: "开放的一天，宜动不宜静", yi: ["开业","社交"], ji: ["藏私房钱"], c: "珊瑚橙", n: 6 },
+  "闭": { t: "宜闭不宜开的一天，适合休息静养", yi: ["休息","静养"], ji: ["出行"], c: "深藏青", n: 2 }
+};
+
+const $ = id => document.getElementById(id);
+function go(url) { location.href = url; }
+let timer = null;
+function soon(name) {
+  const t = $("toast");
+  t.textContent = "「" + name + "」模块开发中，敬请期待 💕";
+  t.classList.add("show");
+  clearTimeout(timer);
+  timer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+(function renderToday() {
+  const d = new Date();
+  const ds = d.getFullYear() + "年" + (d.getMonth()+1) + "月" + d.getDate() + "日";
+  const week = ["日","一","二","三","四","五","六"][d.getDay()];
+  $("date-line").innerHTML = `${ds} 星期${week} · 今天也要元气满满哦`;
+  const gi = dayGZ(d.getFullYear(), d.getMonth()+1, d.getDate());
+  const yi = yearGZ(d.getFullYear(), d.getMonth()+1);
+  const jx = jianXing(d.getFullYear(), d.getMonth()+1, d.getDate());
+  const theme = JIAN_THEME[jx];
+  $("tc-gz").textContent = gzName(gi) + "日 · " + gzName(yi) + "年";
+  // 月相
+  const synodic = 29.53058867;
+  const ref = new Date(Date.UTC(2000, 0, 6));
+  const pd = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const phaseIdx = Math.floor((((pd - ref) / 86400000) % synodic + synodic) % synodic / (synodic / 8)) % 8;
+  const moonNames = ["新月","娥眉月","上弦月","盈凸月","满月","亏凸月","下弦月","残月"];
+  $("tc-moon-svg").innerHTML = `<svg viewBox="0 0 512 512" width="16" height="16" style="vertical-align:-3px;color:#c9a7ff">${window.MOON_SVG[phaseIdx]}</svg>`;
+  $("tc-moon").textContent = moonNames[phaseIdx];
+  $("tc-theme").textContent = `今日建星「${jx}」——${theme.t}。冲${SHENGXIAO[(gi % 12 + 6) % 12]}，属${SHENGXIAO[(gi % 12 + 6) % 12]}的朋友今天多留个心眼。`;
+  $("tc-color").textContent = theme.c;
+  $("tc-num").textContent = theme.n;
+  $("tc-yi").textContent = theme.yi.join("、");
+  $("tc-ji").textContent = theme.ji.join("、");
+})();
+</script>
 </body>
 </html>
