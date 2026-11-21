@@ -301,6 +301,7 @@
 
 <script src="codes.js"></script>
 <script src="lib/iztro.min.js"></script>
+<script src="share.js"></script>
 <script>
 // ================= 干支历法引擎 =================
 const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
@@ -490,11 +491,16 @@ function run() {
 
 function share() {
   const r = window.__last;
-  const text = `我在「每日运势」测了 ${r.date} 的运势：综合 ${r.score} 分\n按传统黄历干支规则计算，同一生辰结果恒定，快来测你的：`;
-  try { navigator.clipboard.writeText(text); } catch (e) {}
-  const out = $("share-out");
-  out.classList.remove("hidden");
-  out.textContent = "👇 分享文案（长按复制）：\n" + text;
+  openShareCard({
+    title: "今日运势 " + r.score + " 分",
+    date: r.date + " · 干支黄历",
+    deco: "🌸", deco2: "🌙",
+    body: `<p><b>综合运势</b>：${r.score} 分</p>` +
+          `<p><b>幸运色</b>：${$("l-color").textContent || "—"} · <b>幸运数字</b>：${$("l-num").textContent || "—"}</p>` +
+          `<p><b>今日建议</b>：${$("summary").textContent.slice(0, 56)}</p>`,
+    cta: "扫码测你的专属运势",
+    text: `我在「今日好运研究所」测了 ${r.date} 的运势：综合 ${r.score} 分\n按传统黄历干支规则计算，同一生辰结果恒定 ✨`
+  });
 }
 function back() {
   $("result-view").classList.add("hidden");
