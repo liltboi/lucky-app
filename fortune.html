@@ -682,7 +682,7 @@ function showReport(type) {
       `<p style="margin-bottom:10px"><b>⑤ 命主给的一句话</b><br>「${pick(rand, ["钱是价值的回声，先把自己活成答案", "别追风口，让风口追上正在做事的你", "慢慢来，比较快", "你的短板，雇人补；你的长板，放大到极致"])}」。</p>` +
       `<p style="margin-bottom:10px"><b>⑥ 避坑提醒</b><br>${pick(rand, ["你这盘最怕「半途而废」：宁可小步慢走，不要频繁换赛道", "你这盘最怕「贪多」：同时开太多线，最后一条都做不深", "你这盘最怕「等人」：机会不会自己来，主动开口才有戏", "你这盘最怕「完美主义」：先交付 80 分，再迭代到 100 分"])}。</p>` +
       (() => { // ⑦+ 随机加插 2 个主题板块, 让报告更丰满
-        const pool = ["talent", "persona", "kw2026", "personality"].filter(x => x !== type);
+        const pool = ["talent", "kw2026"]; // 搞钱报告只加插搞钱相关板块, 与完整命盘拉开差异
         const r2 = seededRandom(CUR.birth + "|" + CUR.hour + "|r19-extras");
         const chosen = [];
         while (chosen.length < 2 && pool.length) chosen.push(pool.splice(Math.floor(r2() * pool.length), 1)[0]);
@@ -773,6 +773,7 @@ function showReport(type) {
       };
       $("premium-title").textContent = "👑 已解锁 · 完整命盘报告（紫微十二宫）";
       $("premium-body").innerHTML =
+        `<p style="margin-bottom:8px"><span style="display:inline-block;background:#ece0ff;color:#8d6fd0;font-size:11px;font-weight:700;border-radius:999px;padding:2px 12px">本篇主题：紫微十二宫 · 完整命盘</span></p>` +
         `<p style="margin-bottom:10px"><b>命盘概览</b><br>八字 <b>${chart.chineseDate}</b> · 命宫在 <b>${mp.earthlyBranch}</b> · 身宫落 <b>${bodyPal ? bodyPal.name : "—"}</b> · 五行局 <b>${chart.fiveElementsClass}</b> · 命主 <b>${chart.soul}</b> · 身主 <b>${chart.body}</b></p>` +
         `<p style="margin-bottom:10px"><b>四化总论（你这个盘的四条主线）</b><br>${mutLines.length ? mutLines.join("<br>") : "四化分布均匀，没有特别倾斜的领域，是均衡型盘"}</p>` +
         `<p style="margin-bottom:6px"><b>【上篇 · 六大主宫详解】</b></p>` +
@@ -807,8 +808,10 @@ function showReport(type) {
         return `<p style="margin-bottom:10px"><b>${name}宫</b>（${pick(rand, ["旺", "稳", "升", "守"])}）<br>${pick(rand, p.good)}。${pick(rand, p.tip)}。</p>`;
       };
       const yearG = yearGZ(by, bm);
-      $("premium-title").textContent = "👑 已解锁 · 完整命盘报告（限时免费体验）";
+      $("premium-title").textContent = "👑 已解锁 · 完整命盘报告 · 简版（排盘引擎未加载）";
       $("premium-body").innerHTML =
+        `<p style="margin-bottom:8px"><span style="display:inline-block;background:#ece0ff;color:#8d6fd0;font-size:11px;font-weight:700;border-radius:999px;padding:2px 12px">本篇主题：命盘全览 · 事业/财帛/感情/学业/健康五宫</span></p>` +
+        `<p style="color:#a98ba6;font-size:11px;margin-bottom:10px">⏳ 排盘引擎本次未加载成功，当前为干支规则简版；刷新页面重试可加载完整紫微十二宫版。</p>` +
         `<p style="margin-bottom:10px"><b>命盘概览</b><br>日柱 <b>${gzName(dg.idx)}</b> · 日主<b>${GAN[dg.gan]}${myW}</b> · 生年 <b>${yearG.name}</b>（${SHENGXIAO[yearG.zhi]}年）${CUR.hour === "unknown" ? "" : " · " + HOURS[CUR.hour]}。五行格局：<b>${myW}</b>为主${myW === GAN_WUXING[yearG.idx % 10] ? "，与生年同气，格局偏纯" : "，与生年相异，格局富变化"}。</p>` +
         sec("事业") + sec("财帛") + sec("感情") + sec("学业") + sec("健康") +
         `<p style="margin-bottom:10px"><b>年度流年提示</b><br>${pick(rand, ["今年宜「守正出新」：主线不动，副线试新", "今年宜「广结善缘」：贵人藏在人堆里", "今年宜「深耕内功」：外部机会平淡，正好修炼", "今年宜「小步快跑」：试错成本低，大胆试"])}</p>` +
