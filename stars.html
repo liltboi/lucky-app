@@ -10,7 +10,7 @@
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
     background: linear-gradient(160deg, #ffe9f1 0%, #ffd6e8 40%, #e8d5ff 100%);
     min-height: 100vh; max-width: 480px; margin: 0 auto;
-    padding: 28px 18px 60px; color: #4a3b52; position: relative;
+    padding: 28px 18px 110px; color: #4a3b52; position: relative;
   }
   .disclaimer-tag {
     display: inline-block; font-size: 10px; color: #b58ab0;
@@ -57,6 +57,18 @@
   .tb-body { font-size: 13px; line-height: 1.9; color: #6b5570; }
   .back-link { display: block; text-align: center; margin-top: 16px; color: #9a7d96; font-size: 13px; text-decoration: none; }
   .hidden { display: none; }
+  /* 底部导航 */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; z-index: 60;
+    background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+    display: flex; padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+    box-shadow: 0 -4px 20px rgba(220,120,180,.2);
+  }
+  .bn-item { flex: 1; text-align: center; font-size: 10px; color: #b195ad; text-decoration: none; padding: 4px 0; }
+  .bn-item .bn-icon { font-size: 18px; display: block; margin-bottom: 1px; filter: grayscale(1) opacity(.6); }
+  .bn-item.active { color: #d4548f; font-weight: 700; }
+  .bn-item.active .bn-icon { filter: none; }
+
   .footer { text-align: center; font-size: 10px; color: #b195ad; line-height: 1.8; margin-top: 26px; }
 </style>
 </head>
@@ -212,5 +224,13 @@ document.getElementById("day-sub").innerHTML =
 buildSignGrid();
 renderTabs();
 </script>
+  <nav class="bottom-nav">
+    <a class="bn-item" href="index.html"><span class="bn-icon">🏠</span>首页</a>
+    <a class="bn-item" href="fortune.html"><span class="bn-icon">🌸</span>运势</a>
+    <a class="bn-item" href="tarot.html"><span class="bn-icon">🃏</span>塔罗</a>
+    <a class="bn-item active" href="stars.html"><span class="bn-icon">♓</span>星座</a>
+    <a class="bn-item" href="javascript:void(0)" onclick="soonNav('我的')"><span class="bn-icon">👤</span>我的</a>
+  </nav>
+  <div class="toast hidden" id="toast" style="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(61,46,70,.9);color:#fff;font-size:13px;border-radius:999px;padding:10px 20px;z-index:99">「我的」开发中 💕</div>
 </body>
 </html>
