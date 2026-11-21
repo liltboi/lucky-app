@@ -138,7 +138,23 @@
   <div class="card">
     <label>你的生日</label>
     <input type="date" id="birth" max="2026-12-31" min="1940-01-01">
-    <label>性别（影响解读口吻，可选）</label>
+    <label>出生时辰（八字需要，不知道选「不确定」）</label>
+    <select id="hour">
+      <option value="unknown">不确定 / 忘了</option>
+      <option value="23-01">子时 23:00-01:00</option>
+      <option value="01-03">丑时 01:00-03:00</option>
+      <option value="03-05">寅时 03:00-05:00</option>
+      <option value="05-07">卯时 05:00-07:00</option>
+      <option value="07-09">辰时 07:00-09:00</option>
+      <option value="09-11">巳时 09:00-11:00</option>
+      <option value="11-13">午时 11:00-13:00</option>
+      <option value="13-15">未时 13:00-15:00</option>
+      <option value="15-17">申时 15:00-17:00</option>
+      <option value="17-19">酉时 17:00-19:00</option>
+      <option value="19-21">戌时 19:00-21:00</option>
+      <option value="21-23">亥时 21:00-23:00</option>
+    </select>
+    <label>性别（影响解读口吻）</label>
     <select id="gender">
       <option value="x">保密</option>
       <option value="f">女生</option>
@@ -154,6 +170,7 @@
   <span class="badge" id="date-tag"></span>
   <h1>你的今日运势</h1>
   <div class="card" style="text-align:center">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px" id="profile-line"></div>
     <div class="score-ring" id="ring">
       <div class="score-num" id="score">0</div>
       <div class="score-label">今日好运指数</div>
@@ -240,9 +257,10 @@ function run() {
     showMsg("未选生日，已用示例生日 1998-06-15 演示");
   }
   const gender = document.getElementById("gender").value;
+  const hour = document.getElementById("hour") ? document.getElementById("hour").value : "unknown";
   const today = new Date();
   const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  const rand = seededRandom(birth + "|" + dateStr);
+  const rand = seededRandom(birth + "|" + hour + "|" + dateStr);
 
   // 挑一个 verdict 档位 (加权后仍由种子决定, 确定性)
   const pick = VERDICTS[Math.floor(rand() * VERDICTS.length)];
@@ -251,6 +269,10 @@ function run() {
   const tone = GENDER_TONE[gender];
 
   document.getElementById("date-tag").textContent = dateStr + " · 仅供娱乐";
+  const hourName = { "unknown": "时辰未提供" };
+  document.querySelectorAll("#hour option").forEach(o => hourName[o.value] = o.textContent.split(" ")[0]);
+  document.getElementById("profile-line").textContent =
+    `测算档案：${birth} · ${hourName[hour] || hour} · ${gender === "f" ? "女" : gender === "m" ? "男" : "保密"}（本页不保存任何信息）`;
   document.getElementById("score").textContent = score;
   document.getElementById("ring").style.setProperty("--s", score);
   document.getElementById("verdict").textContent = pick[1];
