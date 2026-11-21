@@ -163,6 +163,8 @@
   .sticky-cta button {
     flex: 1; padding: 11px; border: none; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer;
   }
+  .mini-rep { padding: 11px 8px; border: none; border-radius: 14px; background: rgba(255,255,255,.92); color: #d4548f; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .mini-rep:active { transform: scale(.96); }
   .sc-a { background: linear-gradient(120deg, #ff9ec7, #c9a7ff); color: #fff; }
   .sc-b { background: #fff0f6; color: #d4548f; border: 1.5px solid #ffc2da; }
   /* 底部导航 */
@@ -277,8 +279,14 @@
       <h3>想认识「命盘里的自己」吗？</h3>
       <p>你的生辰里藏着一套完整的<b>命盘分析</b><br>按传统命理规则排盘解读 · 同一生辰结果恒定</p>
       <button id="btn-r19">🧧 天生搞钱方式分析 · 限时免费</button>
-      <button id="btn-r99" style="margin-top:10px;background:rgba(255,255,255,.92);color:#8d6fd0">👑 完整命盘报告 · 限时免费</button>
-      <p style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.8)">限时免费体验中，正式版将含逐宫深度解读</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+        <button class="mini-rep" data-r="talent">💎 隐藏天赋测试</button>
+        <button class="mini-rep" data-r="persona">💼 事业型人格</button>
+        <button class="mini-rep" data-r="kw2026">🌟 2026 人生关键词</button>
+        <button class="mini-rep" data-r="personality">🪷 命盘性格侧写</button>
+      </div>
+      <button id="btn-r99" style="margin-top:10px;width:100%;padding:11px;border:none;border-radius:999px;background:rgba(255,255,255,.92);color:#8d6fd0;font-size:14px;font-weight:800;cursor:pointer">👑 完整命盘报告 · 限时免费</button>
+      <p style="margin-top:12px;font-size:10px;color:rgba(255,255,255,.8)">限时免费体验中 · 全部报告同一生辰结果恒定</p>
       <div style="text-align:center;margin-top:8px"><span id="redeem-link" style="font-size:11px;color:#fff;text-decoration:underline;cursor:pointer">已有兑换码？</span></div>
     </div>
     <div class="phone-card hidden" id="redeem-box">
@@ -527,6 +535,7 @@ async function sha256Hex(s) {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
 }
+document.querySelectorAll(".mini-rep").forEach(b => b.addEventListener("click", () => showReport(b.dataset.r)));
 $("btn-r19").addEventListener("click", () => showReport("r19"));
 $("btn-r99").addEventListener("click", () => showReport("r99"));
 $("redeem-link").addEventListener("click", () => {
@@ -553,6 +562,90 @@ function myDayGZ() {
   return dayGZ(by, bm, bd);
 }
 function pick(rand, a) { return a[Math.floor(rand() * a.length)]; }
+
+// ================= 主题报告内容 =================
+const TALENT = {
+  "木": ["创意生长力：别人眼里的难题，在你这里是「可以试试」的新点子", "带动团队：你说出来的愿景会让人想跟着走", "跨界整合：把两件不相干的事拼出新玩法"],
+  "火": ["感染力：你一认真，周围的人会不自觉被点燃", "临场反应：越是即兴的场合你越出彩", "审美直觉：对「好看」「有感觉」的东西有天生的准头"],
+  "土": ["靠谱感：答应的事一定办到，这是最稀缺的天赋", "体系化：把混乱的事情理出流程和秩序", "长期主义：别人放弃的时候你还在走，复利属于你"],
+  "金": ["精准眼光：一眼看出哪里不对、哪里可以更好", "标准建立：你定的规矩别人愿意照着执行", "决断力：该切割的时候不拖泥带水"],
+  "水": ["信息嗅觉：风口还没起来你已经在关注了", "适应力：扔到任何新环境你都能快速活下来", "沟通润滑：再僵的场面你都能圆回来"]
+};
+const PERSONA = [
+  { keys: ["紫微", "天府"], name: "掌舵型人格", desc: "你天生坐在指挥位上：不是你抢着做，而是大家默认听你的。适合做主理人、组长、店长这类「拍板」的角色。你的课题是学会授权——不是所有事都要亲自扛。" },
+  { keys: ["七杀", "破军", "贪狼"], name: "开拓型人格", desc: "你的能量在「从 0 到 1」：开新号、闯新平台、试新玩法。守成会让你枯萎，但记得给自己配一个管细节的搭档。" },
+  { keys: ["天机", "巨门"], name: "军师型人格", desc: "你是出主意的那个人：分析、拆解、找漏洞、想方案。适合策划、咨询、内容脚本。你的课题是别只停留在想——方案要落地才算数。" },
+  { keys: ["太阳", "天梁", "天相"], name: "担当型人格", desc: "你天生让人放心：靠谱、有责任感、愿意兜底。适合运营、服务、团队中台。你的课题是学会拒绝——不是所有人的事都要你接。" },
+  { keys: ["太阴", "天同"], name: "细腻型人格", desc: "你的天赋在「感受」：情绪颗粒度比常人细，适合内容创作、用户洞察、陪伴型服务。你的课题是把敏感变成作品，而不是内耗。" },
+  { keys: ["武曲", "廉贞"], name: "执行型人格", desc: "你是把事情做完的那个人：标准高、手感准、交付稳。适合精加工型的手艺路线。你的课题是收 90 分就发布，别磨到 120 分。" }
+];
+const KW2026 = {
+  "木": ["破土", "向东", "抽新芽"], "火": ["发光", "被看见", "趁热"], "土": ["扎根", "攒厚度", "慢即是快"], "金": ["淬炼", "做减法", "亮锋芒"], "水": ["流动", "多线试", "顺势"]
+};
+function chartOr(rt) {
+  try {
+    if (typeof iztro !== "undefined") {
+      const [by, bm, bd] = CUR.birth.split("-").map(Number);
+      const TI = { "23-01":0,"01-03":1,"03-05":2,"05-07":3,"07-09":4,"09-11":5,"11-13":6,"13-15":7,"15-17":8,"17-19":9,"19-21":10,"21-23":11 };
+      return iztro.astro.astrolabeBySolarDate(by + "-" + bm + "-" + bd, CUR.hour === "unknown" ? 0 : TI[CUR.hour], CUR.gender === "m" ? "male" : "female");
+    }
+  } catch (e) {}
+  return null;
+}
+function starOf(chart, palace) {
+  const p = chart && chart.palaces.find(x => x.name === palace);
+  return p && p.majorStars.length ? p.majorStars[0].name : null;
+}
+function showMiniReport(type) {
+  const dg = myDayGZ();
+  const myW = GAN_WUXING[dg.gan];
+  const rand = seededRandom(CUR.birth + "|" + CUR.hour + "|" + type);
+  const chart = chartOr();
+  let title = "", body = "";
+  if (type === "talent") {
+    const t = TALENT[myW];
+    const mp = starOf(chart, "命宫");
+    title = "💎 你的隐藏天赋清单";
+    body =
+      `<p style="margin-bottom:10px"><b>底层天赋</b>（日主${myW}）<br>① ${t[0]}<br>② ${t[1]}<br>③ ${t[2]}</p>` +
+      (mp ? `<p style="margin-bottom:10px"><b>命盘加成</b>（命宫坐${mp}）<br>${STAR_TEXT[mp] || "主星特质内敛"}——这是你天赋的放大器。</p>` : "") +
+      `<p style="margin-bottom:10px"><b>天赋使用说明</b><br>${pick(rand, ["天赋不是拿来欣赏的，是拿来使用的：这周就找一个场景用上第一条", "天赋怕的比较不是平庸，是「知道了但不用」", "把天赋用在对的人面前——找对你的观众"])}。</p>`;
+  } else if (type === "persona") {
+    const op = starOf(chart, "官禄");
+    const persona = (op && PERSONA.find(x => x.keys.includes(op))) || PERSONA[({"木":2,"火":1,"土":3,"金":5,"水":4}[myW])];
+    title = "💼 你属于「" + persona.name + "」";
+    body =
+      `<p style="margin-bottom:10px">${persona.desc}</p>` +
+      `<p style="margin-bottom:10px"><b>你的职场标签</b><br>${pick(rand, ["团队里最稳的那块砖", "点子最多的人", "执行最快的人", "氛围担当", "深度思考担当"])}</p>` +
+      `<p style="margin-bottom:10px"><b>最适合你的发展姿势</b><br>${pick(rand, ["深耕专业：把手艺磨到别人替代不了", "找对平台：你的价值需要被看见的地方", "建立口碑：让作品和信誉替你说话", "组队互补：和与你相反的人搭档"])}。</p>` +
+      (op && STAR_TEXT[op] ? `<p style="color:#a98ba6;font-size:11px">事业宫主星：${op} · ${STAR_TEXT[op]}</p>` : "");
+  } else if (type === "kw2026") {
+    const kw = KW2026[myW];
+    title = "🌟 你的 2026 年人生关键词";
+    body =
+      `<p style="margin-bottom:10px">2026 丙午年，火气当令。你的日主属<b>${myW}</b>，${({"木":"木生火——是你输出和燃烧的一年","火":"火见火——能量翻倍，注意别烧过头","土":"火生土——是收获和沉淀的一年","金":"火克金——是淬炼和重塑的一年","水":"水克火——是你掌控局面的一年"}[myW])}。</p>` +
+      `<p style="margin-bottom:10px"><b>你的三个年度关键词</b><br>① <b>${kw[0]}</b><br>② <b>${kw[1]}</b><br>③ <b>${kw[2]}</b></p>` +
+      `<p style="margin-bottom:10px"><b>年度一句话</b><br>「${pick(rand, ["把去年想做的事，做成今年做过的事", "今年最大的机会，是成为更具体的自己", "别收藏了，开始做", "允许自己慢，但不允许停"])}」</p>` +
+      `<p style="color:#a98ba6;font-size:11px">流年为娱乐化演绎，不构成任何人生决策依据。</p>`;
+  } else if (type === "personality") {
+    const mp = starOf(chart, "命宫");
+    const fd = starOf(chart, "福德");
+    title = "🪷 你的命盘性格侧写";
+    body =
+      (mp ? `<p style="margin-bottom:10px"><b>外在的你</b>（命宫坐${mp}）<br>${STAR_TEXT[mp] || ""}——这是别人眼中的你。</p>` :
+      `<p style="margin-bottom:10px"><b>外在的你</b>（日主${myW}）<br>${({"木":"正直向上，有点理想主义","火":"热情外放，自带存在感","土":"沉稳包容，是大家的定心丸","金":"利落干脆，讲原则","水":"灵活机智，反应快"}[myW])}——这是别人眼中的你。</p>`) +
+      (fd ? `<p style="margin-bottom:10px"><b>内心的你</b>（福德宫坐${fd}）<br>${STAR_TEXT[fd] || ""}——这是只有熟人才知道的你。</p>` :
+      `<p style="margin-bottom:10px"><b>内心的你</b><br>${pick(rand, ["外表淡定，内心戏其实很足", "看似随和，其实对在意的事非常坚持", "看起来社牛，其实需要独处回血", "嘴上佛系，心里有自己的排行榜"])}</p>`) +
+      `<p style="margin-bottom:10px"><b>一句话总结</b><br>「${pick(rand, ["你是慢热型选手——但热起来就很持久", "你是反差感本人——认识越久越惊喜", "你是外柔内刚——原则的事谁也劝不动", "你是氛围引擎——你在的地方就不会冷场"])}」</p>`;
+  }
+  $("premium-title").textContent = title + "（限时免费体验）";
+  $("premium-body").innerHTML = body + `<p style="color:#a98ba6;font-size:11px">仅供娱乐，不构成任何建议。</p>`;
+  const box = $("premium-box");
+  box.classList.remove("hidden");
+  $("sticky-cta").classList.add("hidden");
+  box.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
 function showReport(type) {
   const [by, bm, bd] = CUR.birth.split("-").map(Number);
   const dg = myDayGZ();
